@@ -85,14 +85,17 @@ export default function Sidebar() {
           })}
         </nav>
 
-        <div className="mt-10 pt-6 border-t border-white/10">
-          <div className="bg-gradient-to-br from-blue-900/40 to-purple-900/40 rounded-xl p-4 border border-blue-500/20 relative overflow-hidden">
-            <div className="absolute -top-10 -right-10 w-24 h-24 bg-blue-500/30 rounded-full blur-xl"></div>
-            <h4 className="text-white font-semibold mb-1 relative z-10">Premium Plan</h4>
-            <p className="text-xs text-blue-200 mb-3 relative z-10">Get access to Advanced Tax Planning</p>
-            <button className="w-full py-2 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg text-white text-xs font-bold shadow-lg relative z-10">
+        <div className="mt-10 pt-6 border-t border-white/10 px-2">
+          <div className="bg-gradient-to-br from-blue-600/20 to-purple-600/20 rounded-2xl p-5 border border-white/10 relative overflow-hidden group/premium">
+            <div className="absolute -top-10 -right-10 w-24 h-24 bg-blue-500/20 rounded-full blur-2xl group-hover/premium:scale-110 transition-transform duration-700"></div>
+            <h4 className="text-white font-bold mb-1 relative z-10 text-sm">Premium Plan</h4>
+            <p className="text-[10px] text-blue-300 mb-4 relative z-10 font-medium">Get access to Advanced AI Tax Planning</p>
+            <Link 
+              href="/#pricing" 
+              className="w-full py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 rounded-xl text-white text-[11px] font-black shadow-lg shadow-blue-600/20 relative z-10 flex items-center justify-center transition-all active:scale-95 uppercase tracking-widest"
+            >
               Upgrade Now
-            </button>
+            </Link>
           </div>
         </div>
       </div>
