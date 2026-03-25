@@ -40,7 +40,8 @@ export default function SmartInsights() {
         }));
 
         // Step 2: Send them to Python Backend to prompt Gemini
-        const res = await fetch('http://localhost:8000/api/generate-insights', {
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+        const res = await fetch(`${baseUrl}/api/generate-insights`, {
            method: "POST",
            headers: { "Content-Type": "application/json" },
            body: JSON.stringify({ transactions: txs })

@@ -61,7 +61,11 @@ export default function Features() {
   ];
 
   return (
-    <div id="features" className="py-24 bg-black/40 relative z-10">
+    <div id="features" className="py-32 relative z-10 overflow-hidden">
+      {/* Background Decor */}
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/5 rounded-full blur-[120px] -z-10 rotate-12"></div>
+      <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-purple-600/5 rounded-full blur-[150px] -z-10 -rotate-12"></div>
+      
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}

@@ -68,49 +68,70 @@ export default function Hero() {
               
               <div className="flex flex-1 overflow-hidden relative z-10">
                 {/* Mockup Sidebar */}
-                <div className="w-48 border-r border-white/10 p-6 space-y-6 hidden md:block bg-gradient-to-b from-white/5 to-transparent">
+                <div className="w-48 border-r border-white/10 p-6 space-y-8 hidden md:block bg-gradient-to-b from-white/5 to-transparent">
                   <div className="space-y-4">
-                    <div className="h-2 bg-blue-400/40 rounded w-1/2"></div>
-                    <div className="h-2 bg-white/10 rounded w-full"></div>
-                    <div className="h-2 bg-white/10 rounded w-3/4"></div>
-                    <div className="h-2 bg-white/10 rounded w-5/6"></div>
+                    <div className="flex items-center gap-2 group/item cursor-pointer">
+                       <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></div>
+                       <div className="h-2 bg-white/40 rounded w-16 group-hover:w-20 transition-all"></div>
+                    </div>
+                    <div className="flex items-center gap-2 group/item cursor-pointer">
+                       <div className="w-1.5 h-1.5 rounded-full bg-white/20"></div>
+                       <div className="h-2 bg-white/10 rounded w-20 group-hover:bg-white/20 transition-all"></div>
+                    </div>
+                    <div className="flex items-center gap-2 group/item cursor-pointer">
+                       <div className="w-1.5 h-1.5 rounded-full bg-white/20"></div>
+                       <div className="h-2 bg-white/10 rounded w-14 group-hover:bg-white/20 transition-all"></div>
+                    </div>
                   </div>
-                  <div className="pt-8 space-y-4">
-                    <div className="h-2 bg-purple-400/30 rounded w-2/3"></div>
-                    <div className="h-2 bg-white/10 rounded w-full"></div>
-                    <div className="h-2 bg-white/10 rounded w-4/5"></div>
+                  <div className="pt-4 space-y-4">
+                    <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Analytics</div>
+                    <div className="flex items-center gap-2 group/item cursor-pointer">
+                       <div className="w-1.5 h-1.5 rounded-full bg-purple-500/40"></div>
+                       <div className="h-2 bg-white/10 rounded w-18 group-hover:w-24 transition-all"></div>
+                    </div>
+                    <div className="flex items-center gap-2 group/item cursor-pointer">
+                       <div className="w-1.5 h-1.5 rounded-full bg-white/20"></div>
+                       <div className="h-2 bg-white/10 rounded w-12 group-hover:bg-white/20 transition-all"></div>
+                    </div>
                   </div>
                 </div>
                 
                 {/* Mockup Content */}
                 <div className="flex-1 p-6 space-y-6 flex flex-col overflow-hidden">
                    <div className="flex justify-between items-end">
-                     <div className="space-y-2">
-                       <div className="h-3 bg-white/20 rounded w-32"></div>
-                       <div className="h-7 bg-white/10 rounded w-48"></div>
+                     <div>
+                       <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Current Balance</div>
+                       <div className="text-2xl font-black text-white px-0.5 tracking-tight flex items-center gap-2">
+                         ₹12,45,000
+                         <span className="text-[10px] bg-green-500/10 text-green-400 px-1.5 py-0.5 rounded-md border border-green-500/20">+4.2%</span>
+                       </div>
                      </div>
-                     <div className="h-10 bg-blue-600/20 border border-blue-500/40 rounded-xl w-32 flex items-center justify-center">
-                       <div className="h-2 bg-blue-400 rounded w-16"></div>
+                     <div className="bg-blue-600/20 border border-blue-500/40 rounded-xl px-4 py-2 flex items-center gap-2 shadow-lg shadow-blue-500/10">
+                       <div className="w-3 h-3 bg-blue-400 rounded-full animate-pulse"></div>
+                       <div className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Connect Bank</div>
                      </div>
                    </div>
                    
                    {/* Grid Cards */}
                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                     {[
-                       { color: 'blue', val: '75%' },
-                       { color: 'green', val: '12%' },
-                       { color: 'red', val: '45%' },
-                       { color: 'purple', val: 'OK' }
-                     ].map((c, i) => (
-                       <div key={i} className="bg-white/5 border border-white/10 h-20 rounded-2xl p-4 flex flex-col justify-between hover:bg-white/10 transition-colors">
-                         <div className={`h-2 bg-${c.color}-500/30 rounded w-12`}></div>
-                         <div className="flex justify-between items-end">
-                           <div className="h-5 bg-white/10 rounded w-16"></div>
-                           <span className={`text-[10px] font-bold text-${c.color}-400`}>{c.val}</span>
-                         </div>
-                       </div>
-                     ))}
-                   </div>
+                      {[
+                        { label: 'Income', val: '₹1.85L', color: 'blue', icon: '💰' },
+                        { label: 'Expenses', val: '₹65.4K', color: 'red', icon: '📉' },
+                        { label: 'Savings', val: '₹1.2L', color: 'green', icon: '🏦' },
+                        { label: 'Invested', val: '₹8.5L', color: 'purple', icon: '💎' }
+                      ].map((c, i) => (
+                        <div key={i} className="bg-white/5 border border-white/10 rounded-2xl p-4 flex flex-col justify-between hover:bg-white/10 hover:border-white/20 transition-all group/card shadow-lg shadow-black/20">
+                          <div className="flex justify-between items-start">
+                            <span className="text-lg grayscale group-hover/card:grayscale-0 transition-all">{c.icon}</span>
+                            <div className="w-1.5 h-1.5 rounded-full bg-white/20"></div>
+                          </div>
+                          <div>
+                            <div className="text-[9px] font-black text-zinc-500 uppercase tracking-wider mb-0.5">{c.label}</div>
+                            <div className="text-sm font-black text-white">{c.val}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                    
                    <div className="flex-1 grid grid-cols-1 lg:grid-cols-5 gap-6 overflow-hidden">
                      {/* Health Score Circle */}
@@ -129,18 +150,22 @@ export default function Hero() {
                      </div>
                      
                      {/* Recent Activities */}
-                     <div className="lg:col-span-3 border border-white/10 bg-white/5 rounded-2xl p-6 space-y-4">
-                        <div className="h-3 bg-white/20 w-32 rounded mb-4"></div>
-                        {[1, 2, 3].map(i => (
-                          <div key={i} className="h-10 bg-black/40 border border-white/5 rounded-xl flex items-center px-4 justify-between group hover:border-white/10 transition-colors">
-                            <div className="flex gap-4 items-center">
-                              <div className={`w-3 h-3 rounded-full ${i === 1 ? 'bg-red-400' : 'bg-green-400'} animate-pulse`}></div>
-                              <div className="w-32 h-2.5 bg-white/10 rounded"></div>
-                            </div>
-                            <div className="w-16 h-2.5 bg-white/20 rounded"></div>
-                          </div>
-                        ))}
-                     </div>
+                      <div className="lg:col-span-3 border border-white/10 bg-white/5 rounded-2xl p-6 space-y-4">
+                         <div className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-4">Live Insights</div>
+                         {[
+                           { t: 'High Spend: Dining', v: '-₹2,400', c: 'red' },
+                           { t: 'SIP Recommendation', v: 'Update', c: 'blue' },
+                           { t: 'Tax Saving Found', v: 'View', c: 'green' }
+                         ].map((item, i) => (
+                           <div key={i} className="h-12 bg-black/40 border border-white/5 rounded-xl flex items-center px-4 justify-between group hover:border-blue-500/30 transition-all cursor-pointer">
+                             <div className="flex gap-3 items-center">
+                               <div className={`w-2 h-2 rounded-full ${item.c === 'red' ? 'bg-red-400' : item.c === 'blue' ? 'bg-blue-400' : 'bg-green-400'} shadow-[0_0_10px_rgba(255,255,255,0.1)]`}></div>
+                               <div className="text-[11px] font-bold text-gray-300 group-hover:text-white transition-colors">{item.t}</div>
+                             </div>
+                             <div className={`text-[10px] font-black ${item.c === 'red' ? 'text-red-400 bg-red-400/10 border-red-400/20' : item.c === 'blue' ? 'text-blue-400 bg-blue-400/10 border-blue-400/20' : 'text-green-400 bg-green-400/10 border-green-400/20'} px-2.5 py-1 rounded-lg border`}>{item.v}</div>
+                           </div>
+                         ))}
+                      </div>
                    </div>
                 </div>
               </div>

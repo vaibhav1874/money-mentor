@@ -51,36 +51,39 @@ export default function ProfilePage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Profile Card */}
-        <div className="col-span-1 bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col items-center backdrop-blur-sm relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl"></div>
+        <div className="col-span-1 bg-white/5 border border-white/10 rounded-3xl p-8 flex flex-col items-center backdrop-blur-xl relative overflow-hidden group shadow-2xl shadow-black/40">
+          <div className="absolute top-0 right-0 w-48 h-48 bg-purple-600/10 rounded-full blur-[60px] group-hover:bg-purple-600/20 transition-colors duration-700"></div>
+          <div className="absolute bottom-0 left-0 w-32 h-32 bg-blue-600/10 rounded-full blur-[50px]"></div>
           
-          <div className="w-32 h-32 rounded-full border-4 border-white/10 bg-gradient-to-tr from-blue-600 to-purple-600 p-1 mb-4 relative z-10">
-            <div className="w-full h-full bg-black rounded-full flex items-center justify-center overflow-hidden">
+          <div className="w-40 h-40 rounded-full border-4 border-white/5 bg-gradient-to-tr from-blue-600 via-indigo-500 to-purple-600 p-1 mb-6 relative z-10 shadow-2xl transform transition-transform group-hover:scale-105 duration-500">
+            <div className="w-full h-full bg-black rounded-full flex items-center justify-center overflow-hidden border-4 border-black/50">
                {user.photoURL ? (
                  <img src={user.photoURL} alt="Profile" className="w-full h-full object-cover" />
                ) : (
-                 <span className="text-4xl text-white">{user.displayName ? user.displayName.charAt(0).toUpperCase() : '👤'}</span>
+                 <span className="text-5xl font-black text-white drop-shadow-lg">{user.displayName ? user.displayName.charAt(0).toUpperCase() : '👤'}</span>
                )}
             </div>
-            <button className="absolute bottom-0 right-0 bg-blue-500 p-2 rounded-full text-white border-2 border-black hover:bg-blue-400 transition-colors">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+            <button className="absolute bottom-1 right-1 bg-blue-500 p-3 rounded-2xl text-white border-2 border-black hover:bg-blue-400 transition-all hover:scale-110 shadow-xl">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
             </button>
           </div>
           
-          <h2 className="text-xl font-bold text-white mb-1 relative z-10">{user.displayName || "Google User"}</h2>
-          <p className="text-gray-400 text-sm mb-6 relative z-10">{user.email}</p>
+          <div className="text-center relative z-10 mb-8 w-full">
+            <h2 className="text-2xl font-black text-white mb-1 tracking-tight">{user.displayName || "Financier"}</h2>
+            <p className="text-zinc-400 text-sm font-medium opacity-80">{user.email}</p>
+          </div>
 
-          <div className="w-full space-y-3 relative z-10">
-            <div className="flex justify-between items-center bg-black/40 p-3 rounded-lg border border-white/5">
-              <span className="text-sm text-gray-400">Account Tier</span>
-              <span className="text-sm font-medium text-purple-400 bg-purple-500/10 px-2 py-1 rounded">Premium</span>
+          <div className="w-full space-y-4 relative z-10 mt-auto">
+            <div className="flex justify-between items-center bg-white/5 p-4 rounded-2xl border border-white/10 hover:bg-white/10 transition-colors">
+              <span className="text-sm font-bold text-zinc-400 uppercase tracking-widest">Account Tier</span>
+              <span className="text-xs font-black text-purple-400 bg-purple-500/10 border border-purple-500/20 px-3 py-1 rounded-full uppercase tracking-tighter">Premium Elite</span>
             </div>
-            <div className="flex justify-between items-center bg-black/40 p-3 rounded-lg border border-white/5">
-              <span className="text-sm text-gray-400">Member Since</span>
-              <span className="text-sm font-medium text-white">{creationDate}</span>
+            <div className="flex justify-between items-center bg-white/5 p-4 rounded-2xl border border-white/10 hover:bg-white/10 transition-colors">
+              <span className="text-sm font-bold text-zinc-400 uppercase tracking-widest">Joined</span>
+              <span className="text-sm font-black text-white">{creationDate}</span>
             </div>
           </div>
         </div>
