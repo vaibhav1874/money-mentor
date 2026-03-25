@@ -6,6 +6,7 @@ import SummaryCards from "@/components/dashboard/SummaryCards";
 import AddTransactionModal from "@/components/dashboard/AddTransactionModal";
 import SpendingAnalyticsChart from "@/components/dashboard/SpendingAnalyticsChart";
 import BankStatementUpload from "@/components/dashboard/BankStatementUpload";
+import BankConnectModal from "@/components/dashboard/BankConnectModal";
 import { db, auth } from "@/lib/firebase";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { useRouter } from "next/navigation";
@@ -15,6 +16,7 @@ export default function DashboardPage() {
   const [transactions, setTransactions] = useState<any[]>([]);
   const [healthScore, setHealthScore] = useState(0);
   const [isDemoMode, setIsDemoMode] = useState(false);
+  const [isBankModalOpen, setIsBankModalOpen] = useState(false);
   const [importedData, setImportedData] = useState<any[]>([]);
   const router = useRouter();
 
@@ -82,7 +84,12 @@ export default function DashboardPage() {
   }, [router, isDemoMode, importedData, calculateHealthScore]);
 
   const handleDataImported = (newTxs: any[]) => {
-    setImportedData([...newTxs, ...importedData]);
+    setImportedData((prev) => [...newTxs, ...prev]);
+    setIsDemoMode(true);
+  };
+
+  const handleBankConnect = (newTxs: any[]) => {
+    setImportedData((prev) => [...newTxs, ...prev]);
     setIsDemoMode(true);
   };
 
@@ -100,7 +107,7 @@ export default function DashboardPage() {
             )}
           </div>
           <p className="text-gray-400 mt-1">
-            {isDemoMode ? "Viewing simulated data from your bank statement." : "Welcome back, your real-time financial hub."}
+            {isDemoMode ? "Viewing simulated data from your bank / statement." : "Welcome back, your real-time financial hub."}
           </p>
         </div>
         
@@ -127,7 +134,6 @@ export default function DashboardPage() {
             <SpendingAnalyticsChart transactions={transactions} />
           </div>
 
-          {/* Recent Transactions List */}
           <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-medium text-white flex items-center gap-2">
@@ -172,13 +178,23 @@ export default function DashboardPage() {
             <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-all"></div>
             <h3 className="text-lg font-bold text-white mb-2 leading-snug">Connect Your Bank</h3>
             <p className="text-gray-400 text-sm mb-6 leading-relaxed">Securely sync your transactions for real-time AI insights.</p>
-            <button className="w-full py-3 bg-white text-black rounded-xl font-bold text-sm hover:bg-blue-50 transition-colors shadow-lg shadow-white/5">
+            <button 
+              onClick={() => setIsBankModalOpen(true)}
+              className="w-full py-3 bg-white text-black rounded-xl font-bold text-sm hover:bg-blue-50 transition-colors shadow-lg shadow-white/5"
+            >
               Connect Bank Account
             </button>
           </div>
         </div>
       </div>
+
+      <BankConnectModal 
+        isOpen={isBankModalOpen} 
+        onClose={() => setIsBankModalOpen(false)} 
+        onConnect={handleBankConnect}
+      />
     </div>
   );
 }
+
 
