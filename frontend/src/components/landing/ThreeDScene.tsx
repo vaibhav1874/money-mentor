@@ -18,7 +18,7 @@ function GlassOrb({ position, scale = 1, color = "#3b82f6" }: { position: [numbe
   return (
     <Float speed={1.5} rotationIntensity={1} floatIntensity={2} position={position}>
       <mesh ref={meshRef} scale={scale}>
-        <sphereGeometry args={[1, 64, 64]} />
+        <sphereGeometry args={[1, 32, 32]} />
         <MeshDistortMaterial 
           color={color}
           speed={3}
@@ -47,7 +47,7 @@ function FloatingCoin({ position, rotation, color = "#eab308" }: { position: [nu
   return (
     <Float speed={2} rotationIntensity={0.5} floatIntensity={1} position={position}>
       <mesh ref={meshRef} rotation={rotation}>
-        <cylinderGeometry args={[0.8, 0.8, 0.1, 64]} />
+        <cylinderGeometry args={[0.8, 0.8, 0.1, 32]} />
         <meshPhysicalMaterial 
           color={color} 
           metalness={1} 
@@ -64,7 +64,11 @@ function FloatingCoin({ position, rotation, color = "#eab308" }: { position: [nu
 export default function ThreeDScene() {
   return (
     <div className="absolute inset-0 w-full h-full pointer-events-none z-0">
-      <Canvas camera={{ position: [0, 0, 12], fov: 45 }} gl={{ antialias: true, alpha: true }}>
+      <Canvas 
+        camera={{ position: [0, 0, 12], fov: 45 }} 
+        gl={{ antialias: false, alpha: true }}
+        dpr={[1, 2]}
+      >
         <ambientLight intensity={0.5} />
         <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={2} />
         <pointLight position={[-10, -10, -10]} intensity={1} color="#8b5cf6" />

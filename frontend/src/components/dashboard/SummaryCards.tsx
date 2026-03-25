@@ -1,133 +1,93 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { db, auth } from "@/lib/firebase";
-import { collection, query, where, onSnapshot } from "firebase/firestore";
-import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
+import { 
+  TrendingUp, 
+  TrendingDown, 
+  Wallet, 
+  ArrowUpRight, 
+  ArrowDownRight, 
+  PieChart 
+} from "lucide-react";
 
-export default function SummaryCards() {
-  const [data, setData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const router = useRouter();
+interface SummaryCardsProps {
+  transactions: any[];
+}
 
-  useEffect(() => {
-    const unsubscribeAuth = auth.onAuthStateChanged((user) => {
-      if (user) {
-        // User is signed in, set up snapshot listener for real-time transactions
-        const q = query(collection(db, "transactions"), where("userId", "==", user.uid));
-        
-        const unsubscribeSnapshot = onSnapshot(q, (snapshot) => {
-          let income = 0;
-          let expense = 0;
-          
-          snapshot.forEach(doc => {
-            const data = doc.data();
-            if (data.type === "Income") income += data.amount;
-            else if (data.type === "Expense") expense += data.amount;
-          });
-          
-          // Using exactly what is in Firestore (no mock offsets)
-          setData({
-             totalBalance: `₹${(income - expense).toLocaleString('en-IN')}`,
-             monthlyIncome: `₹${income.toLocaleString('en-IN')}`,
-             monthlyExpenses: `₹${expense.toLocaleString('en-IN')}`,
-             totalInvestments: "₹0", // Extend this if you add an Investments category mapping
-          });
-          setLoading(false);
-        }, (error) => {
-          console.error("Firestore Error:", error);
-          setLoading(false);
-        });
-        
-        return () => unsubscribeSnapshot();
-      } else {
-        // Not logged in, redirect to login
-        router.push("/login");
-      }
-    });
+export default function SummaryCards({ transactions }: SummaryCardsProps) {
+  let totalIncome = 0;
+  let totalExpense = 0;
 
-    return () => unsubscribeAuth();
-  }, [router]);
+  transactions.forEach(tx => {
+    if (tx.type === "Income") totalIncome += Number(tx.amount);
+    else if (tx.type === "Expense") totalExpense += Number(tx.amount);
+  });
+
+  const balance = totalIncome - totalExpense;
 
   const cards = [
     {
       title: "Total Balance",
-      amount: data?.totalBalance || "₹0",
-      trend: "+2.5%",
+      amount: `₹${balance.toLocaleString('en-IN')}`,
+      trend: "+2.4%", // Simulated trend
       isPositive: true,
-      icon: (
-        <svg className="w-6 h-6 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      ),
+      icon: <Wallet className="w-5 h-5 text-blue-400" />,
       color: "from-blue-600/20 to-blue-600/5",
       borderColor: "border-blue-500/20"
     },
     {
       title: "Monthly Income",
-      amount: data?.monthlyIncome || "₹0",
+      amount: `₹${totalIncome.toLocaleString('en-IN')}`,
       trend: "+12%",
       isPositive: true,
-      icon: (
-        <svg className="w-6 h-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-        </svg>
-      ),
+      icon: <ArrowUpRight className="w-5 h-5 text-green-400" />,
       color: "from-green-600/20 to-green-600/5",
       borderColor: "border-green-500/20"
     },
     {
       title: "Monthly Expenses",
-      amount: data?.monthlyExpenses || "₹0",
+      amount: `₹${totalExpense.toLocaleString('en-IN')}`,
       trend: "-5.2%",
-      isPositive: true,
-      icon: (
-        <svg className="w-6 h-6 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />
-        </svg>
-      ),
+      isPositive: false,
+      icon: <ArrowDownRight className="w-5 h-5 text-red-400" />,
       color: "from-red-600/20 to-red-600/5",
       borderColor: "border-red-500/20"
     },
     {
-      title: "Total Investments",
-      amount: data?.totalInvestments || "₹0",
+      title: "Total Savings",
+      amount: `₹${(totalIncome * 0.15).toLocaleString('en-IN')}`, // Simulated savings
       trend: "+15.8%",
       isPositive: true,
-      icon: (
-        <svg className="w-6 h-6 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-        </svg>
-      ),
+      icon: <PieChart className="w-5 h-5 text-purple-400" />,
       color: "from-purple-600/20 to-purple-600/5",
       borderColor: "border-purple-500/20"
     }
   ];
 
-  if (loading) {
-    return <div className="text-gray-400 text-sm animate-pulse">Loading Live Firestore Database...</div>;
-  }
-
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
       {cards.map((card, index) => (
-        <div 
+        <motion.div 
           key={index} 
-          className={`bg-gradient-to-br ${card.color} border ${card.borderColor} rounded-2xl p-6 relative overflow-hidden backdrop-blur-sm transition-all hover:-translate-y-1 hover:shadow-lg`}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: index * 0.1 }}
+          className={`group bg-gradient-to-br ${card.color} border ${card.borderColor} rounded-3xl p-5 sm:p-6 relative overflow-hidden backdrop-blur-md transition-all hover:scale-[1.02] hover:bg-white/[0.08]`}
         >
-          <div className="flex justify-between items-start mb-4">
-            <div className="w-12 h-12 rounded-xl bg-black/40 border border-white/5 flex items-center justify-center">
+          <div className="flex justify-between items-start mb-6">
+            <div className="w-12 h-12 rounded-2xl bg-black/40 border border-white/5 flex items-center justify-center group-hover:scale-110 transition-transform shadow-inner">
               {card.icon}
             </div>
-            <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${card.isPositive ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
+            <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${card.isPositive ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
+              {card.isPositive ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
               {card.trend}
-            </span>
+            </div>
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-400 mb-1">{card.title}</p>
-            <h3 className="text-2xl font-bold text-white tracking-tight">{card.amount}</h3>
+            <p className="text-[11px] font-bold text-gray-400 mb-1 uppercase tracking-widest leading-none">{card.title}</p>
+            <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight">{card.amount}</h3>
           </div>
-        </div>
+        </motion.div>
       ))}
     </div>
   );

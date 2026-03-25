@@ -127,7 +127,7 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
         <div className="xl:col-span-3 space-y-6">
-          <SummaryCards />
+          <SummaryCards transactions={transactions} />
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <MoneyHealthScore score={healthScore} />

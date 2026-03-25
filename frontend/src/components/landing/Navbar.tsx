@@ -10,12 +10,13 @@ export default function Navbar() {
               MoneyMitra AI
             </Link>
           </div>
-          <div className="hidden md:flex items-center space-x-8">
-            <Link href="#features" className="text-gray-300 hover:text-white transition-colors">Features</Link>
-            <Link href="#how-it-works" className="text-gray-300 hover:text-white transition-colors">How it Works</Link>
+          <div className="hidden md:flex items-center space-x-8 text-sm font-medium">
+            <Link href="#features" className="text-gray-400 hover:text-white transition-colors">Features</Link>
+            <Link href="#how-it-works" className="text-gray-400 hover:text-white transition-colors">How it Works</Link>
+            <Link href="#pricing" className="text-gray-400 hover:text-white transition-colors">Pricing</Link>
             <div className="flex items-center space-x-4 ml-6 border-l border-white/10 pl-6">
-              <Link href="/login" className="text-gray-300 hover:text-white transition-colors font-medium">Log in</Link>
-              <Link href="/signup" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white px-5 py-2 rounded-full font-medium transition-all shadow-[0_0_15px_rgba(59,130,246,0.5)]">
+              <Link href="/login" className="text-gray-400 hover:text-white transition-colors">Log in</Link>
+              <Link href="/signup" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white px-5 py-2.5 rounded-full transition-all shadow-lg shadow-blue-600/20 active:scale-95">
                 Get Started
               </Link>
             </div>
