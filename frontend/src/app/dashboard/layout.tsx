@@ -1,3 +1,5 @@
+"use client";
+
 import Sidebar from "@/components/dashboard/Sidebar";
 import Topnav from "@/components/dashboard/Topnav";
 import { DashboardProvider } from "@/context/DashboardContext";
