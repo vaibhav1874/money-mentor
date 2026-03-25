@@ -10,6 +10,7 @@ import BankConnectModal from "@/components/dashboard/BankConnectModal";
 import IntelligencePanel from "@/components/dashboard/IntelligencePanel";
 import SubscriptionTracker from "@/components/dashboard/SubscriptionTracker";
 import AdvancedIntelligence from "@/components/dashboard/AdvancedIntelligence";
+import FinancialReportModal from "@/components/dashboard/FinancialReportModal";
 import { db, auth } from "@/lib/firebase";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { useRouter } from "next/navigation";
@@ -24,6 +25,7 @@ export default function DashboardPage() {
   } = useDashboard();
   
   const [isBankModalOpen, setIsBankModalOpen] = useState(false);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [importedData, setImportedData] = useState<any[]>([]);
   const [metrics, setMetrics] = useState<any>({
     thisMonthIncome: 0,
@@ -176,7 +178,10 @@ export default function DashboardPage() {
         <div className="xl:col-span-3 space-y-6">
           <SummaryCards transactions={transactions} />
           
-          <IntelligencePanel metrics={metrics} />
+          <IntelligencePanel 
+            metrics={metrics} 
+            onGenerateReport={() => setIsReportModalOpen(true)}
+          />
 
           <AdvancedIntelligence 
             savingsRate={metrics.savingsRatio}
@@ -249,6 +254,18 @@ export default function DashboardPage() {
         isOpen={isBankModalOpen} 
         onClose={() => setIsBankModalOpen(false)} 
         onConnect={handleBankConnect}
+      />
+
+      <FinancialReportModal 
+        isOpen={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
+        metrics={{
+          thisMonthIncome: metrics.thisMonthIncome,
+          thisMonthExpense: metrics.thisMonthExpense,
+          savingsRatio: metrics.savingsRatio,
+          persona: metrics.persona,
+          healthScore: healthScore
+        }}
       />
     </div>
   );

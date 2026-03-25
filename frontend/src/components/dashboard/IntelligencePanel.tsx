@@ -23,7 +23,7 @@ interface IntelligenceMetrics {
   streak: number;
 }
 
-export default function IntelligencePanel({ metrics }: { metrics: IntelligenceMetrics }) {
+export default function IntelligencePanel({ metrics, onGenerateReport }: { metrics: IntelligenceMetrics, onGenerateReport: () => void }) {
   const expenseChange = metrics.lastMonthExpense > 0 
     ? ((metrics.thisMonthExpense - metrics.lastMonthExpense) / metrics.lastMonthExpense) * 100 
     : 0;
@@ -157,6 +157,7 @@ export default function IntelligencePanel({ metrics }: { metrics: IntelligenceMe
 
       {/* Action Trigger for Report */}
       <motion.button 
+        onClick={onGenerateReport}
         whileHover={{ scale: 1.01 }}
         whileTap={{ scale: 0.99 }}
         className="w-full bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-6 flex items-center justify-between group shadow-xl shadow-blue-600/10"
