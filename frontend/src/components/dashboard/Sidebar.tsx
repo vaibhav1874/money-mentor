@@ -2,6 +2,16 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { 
+  LayoutDashboard, 
+  MessageSquareText, 
+  Target, 
+  Zap, 
+  User, 
+  Sparkles, 
+  ArrowUpRight 
+} from "lucide-react";
+import { motion } from "framer-motion";
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -10,92 +20,108 @@ export default function Sidebar() {
     {
       name: "Dashboard",
       href: "/dashboard",
-      icon: (
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-        </svg>
-      )
+      icon: LayoutDashboard,
     },
     {
       name: "Smart Chat",
       href: "/dashboard/chat",
-      icon: (
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-        </svg>
-      )
+      icon: MessageSquareText,
     },
     {
       name: "Goal Planner",
       href: "/dashboard/goals",
-      icon: (
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-        </svg>
-      )
+      icon: Target,
     },
     {
       name: "Insights",
       href: "/dashboard/insights",
-      icon: (
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-        </svg>
-      )
+      icon: Zap,
     },
     {
       name: "Profile",
       href: "/dashboard/profile",
-      icon: (
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-        </svg>
-      )
+      icon: User,
     }
   ];
 
   return (
-    <div className="hidden md:flex flex-col w-64 bg-black border-r border-white/10 h-screen sticky top-0">
-      <div className="h-16 flex items-center px-6 border-b border-white/10 shrink-0">
-        <Link href="/dashboard" className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
-          MoneyMitra AI
+    <div className="hidden md:flex flex-col w-72 bg-black border-r border-white/5 h-screen sticky top-0 z-50">
+      <div className="h-20 flex items-center px-8 shrink-0">
+        <Link href="/dashboard" className="flex items-center gap-2 group">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/20 group-hover:scale-110 transition-transform">
+            <Sparkles className="w-5 h-5 text-white" />
+          </div>
+          <span className="text-xl font-bold tracking-tight text-white uppercase italic">
+            Money<span className="text-primary-500">Mitra</span>
+          </span>
         </Link>
       </div>
-      <div className="flex-1 overflow-y-auto py-6 px-4">
-        <nav className="space-y-2">
+
+      <div className="flex-1 overflow-y-auto py-8 px-4">
+        <nav className="space-y-1.5">
           {navItems.map((item) => {
             const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname?.startsWith(item.href));
+            const Icon = item.icon;
             
             return (
               <Link
                 key={item.name}
                 href={item.href}
-                className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all ${
-                  isActive 
-                    ? "bg-gradient-to-r from-blue-600/20 to-purple-600/20 text-white border border-blue-500/30 shadow-[0_0_10px_rgba(59,130,246,0.1)]" 
-                    : "text-gray-400 hover:text-white hover:bg-white/5"
-                }`}
+                className="relative group"
               >
-                <div className={`${isActive ? "text-blue-400" : "text-gray-500"}`}>
-                  {item.icon}
+                <div className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-300 ${
+                  isActive 
+                    ? "bg-white/5 text-white" 
+                    : "text-gray-400 hover:text-white hover:bg-white/[0.02]"
+                }`}>
+                  <div className={`transition-colors duration-300 ${isActive ? "text-primary-500" : "group-hover:text-white"}`}>
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <span className={`font-medium tracking-tight ${isActive ? "text-white" : ""}`}>{item.name}</span>
+                  
+                  {isActive && (
+                    <motion.div 
+                      layoutId="activeNav"
+                      className="absolute left-[-1rem] w-1 h-6 bg-primary-500 rounded-r-full shadow-[0_0_10px_rgba(139,92,246,0.5)]"
+                    />
+                  )}
                 </div>
-                <span className="font-medium">{item.name}</span>
               </Link>
             );
           })}
         </nav>
 
-        <div className="mt-10 pt-6 border-t border-white/10 px-2">
-          <div className="bg-gradient-to-br from-blue-600/20 to-purple-600/20 rounded-2xl p-5 border border-white/10 relative overflow-hidden group/premium">
-            <div className="absolute -top-10 -right-10 w-24 h-24 bg-blue-500/20 rounded-full blur-2xl group-hover/premium:scale-110 transition-transform duration-700"></div>
-            <h4 className="text-white font-bold mb-1 relative z-10 text-sm">Premium Plan</h4>
-            <p className="text-[10px] text-blue-300 mb-4 relative z-10 font-medium">Get access to Advanced AI Tax Planning</p>
-            <Link 
-              href="/#pricing" 
-              className="w-full py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 rounded-xl text-white text-[11px] font-black shadow-lg shadow-blue-600/20 relative z-10 flex items-center justify-center transition-all active:scale-95 uppercase tracking-widest"
-            >
-              Upgrade Now
-            </Link>
+        <div className="mt-12 pt-8 border-t border-white/5 px-2">
+          <div className="glass-card rounded-2xl p-6 relative overflow-hidden group/premium">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-primary-500/10 rounded-full blur-2xl group-hover/premium:scale-150 transition-transform duration-700"></div>
+            
+            <div className="relative z-10">
+              <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center mb-4 border border-white/10 group-hover/premium:border-primary-500/50 transition-colors">
+                <Sparkles className="w-5 h-5 text-primary-500" />
+              </div>
+              <h4 className="text-white font-bold text-sm mb-1 leading-tight">Pro Intelligence</h4>
+              <p className="text-[11px] text-gray-500 mb-5 leading-relaxed">Unlock advanced AI audits & tax optimization agents.</p>
+              
+              <Link 
+                href="/#pricing" 
+                className="w-full py-2.5 premium-gradient-primary rounded-xl text-white text-[11px] font-bold shadow-lg shadow-purple-500/20 flex items-center justify-center gap-2 transition-all hover:opacity-90 active:scale-[0.98] uppercase tracking-wider"
+              >
+                Upgrade Now
+                <ArrowUpRight className="w-3 h-3" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div className="p-6 border-t border-white/5">
+        <div className="flex items-center gap-3 px-2">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-gray-800 to-gray-900 border border-white/10 flex items-center justify-center overflow-hidden">
+            <User className="w-5 h-5 text-gray-400" />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-sm font-bold text-white leading-none">Vaibhav</span>
+            <span className="text-[10px] text-gray-500 mt-1 uppercase tracking-widest font-medium">Free Tier</span>
           </div>
         </div>
       </div>
