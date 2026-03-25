@@ -1,5 +1,6 @@
 import MoneyHealthScore from "@/components/dashboard/MoneyHealthScore";
 import SummaryCards from "@/components/dashboard/SummaryCards";
+import AddTransactionModal from "@/components/dashboard/AddTransactionModal";
 
 export default function DashboardPage() {
   return (
@@ -13,9 +14,7 @@ export default function DashboardPage() {
           <button className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-sm font-medium text-white hover:bg-white/10 transition-colors">
             Export Report
           </button>
-          <button className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg text-sm font-medium text-white shadow-lg shadow-purple-500/20 hover:from-blue-500 hover:to-purple-500 transition-all">
-            + Add Transaction
-          </button>
+          <AddTransactionModal />
         </div>
       </div>
 

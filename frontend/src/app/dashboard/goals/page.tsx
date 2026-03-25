@@ -1,38 +1,33 @@
+"use client";
+
+import { useState, useEffect } from "react";
+
 export default function GoalPlanner() {
-  const goals = [
-    {
-      id: 1,
-      name: "Dream Home Downpayment",
-      target: 2500000,
-      current: 850000,
-      deadline: "Dec 2026",
-      suggestedSip: 45000,
-      icon: "🏠",
-      color: "blue"
-    },
-    {
-      id: 2,
-      name: "Europe Vacation",
-      target: 400000,
-      current: 120000,
-      deadline: "Jun 2025",
-      suggestedSip: 18000,
-      icon: "✈️",
-      color: "purple"
-    },
-    {
-      id: 3,
-      name: "Emergency Fund",
-      target: 600000,
-      current: 550000,
-      deadline: "Dec 2024",
-      suggestedSip: 8000,
-      icon: "🛡️",
-      color: "green"
+  const [goals, setGoals] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const res = await fetch('http://localhost:8000/api/goals');
+        if (res.ok) {
+          const json = await res.json();
+          setGoals(json);
+        }
+      } catch (error) {
+        console.error("Failed to fetch goals data", error);
+      } finally {
+        setLoading(false);
+      }
     }
-  ];
+    fetchData();
+  }, []);
 
   const formatCurrency = (val: number) => `₹${val.toLocaleString('en-IN')}`;
+
+  if (loading) {
+    return <div className="text-gray-400 animate-pulse p-4">Loading your financial goals...</div>;
+  }
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
@@ -50,7 +45,7 @@ export default function GoalPlanner() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {goals.map((goal) => {
+        {goals.map((goal: any) => {
           const progress = Math.min(100, Math.round((goal.current / goal.target) * 100));
           
           return (

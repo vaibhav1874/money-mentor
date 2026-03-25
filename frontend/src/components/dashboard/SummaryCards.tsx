@@ -1,8 +1,32 @@
+"use client";
+
+import { useState, useEffect } from "react";
+
 export default function SummaryCards() {
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const res = await fetch('http://localhost:8000/api/summary');
+        if (res.ok) {
+          const json = await res.json();
+          setData(json);
+        }
+      } catch (error) {
+        console.error("Failed to fetch summary data", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
+
   const cards = [
     {
       title: "Total Balance",
-      amount: "₹12,45,000",
+      amount: data?.totalBalance || "₹0",
       trend: "+2.5%",
       isPositive: true,
       icon: (
@@ -15,7 +39,7 @@ export default function SummaryCards() {
     },
     {
       title: "Monthly Income",
-      amount: "₹1,85,000",
+      amount: data?.monthlyIncome || "₹0",
       trend: "+12%",
       isPositive: true,
       icon: (
@@ -28,9 +52,9 @@ export default function SummaryCards() {
     },
     {
       title: "Monthly Expenses",
-      amount: "₹65,400",
+      amount: data?.monthlyExpenses || "₹0",
       trend: "-5.2%",
-      isPositive: true, // Less expenses is positive
+      isPositive: true,
       icon: (
         <svg className="w-6 h-6 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />
@@ -41,7 +65,7 @@ export default function SummaryCards() {
     },
     {
       title: "Total Investments",
-      amount: "₹8,50,000",
+      amount: data?.totalInvestments || "₹0",
       trend: "+15.8%",
       isPositive: true,
       icon: (
@@ -53,6 +77,10 @@ export default function SummaryCards() {
       borderColor: "border-purple-500/20"
     }
   ];
+
+  if (loading) {
+    return <div className="text-gray-400 text-sm animate-pulse">Loading Summary...</div>;
+  }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">

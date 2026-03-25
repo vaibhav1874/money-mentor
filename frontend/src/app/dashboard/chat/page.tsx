@@ -8,37 +8,14 @@ export default function ChatPage() {
       id: 1,
       sender: "ai",
       text: "Hi there! 👋 I'm your MoneyMitra. How can I help you with your finances today?",
-      time: "10:00 AM"
-    },
-    {
-      id: 2,
-      sender: "user",
-      text: "How much did I spend on dining this month?",
-      time: "10:05 AM"
-    },
-    {
-      id: 3,
-      sender: "ai",
-      text: "You've spent ₹14,500 on dining out so far this month. This is 45% higher than your usual monthly average. Would you like me to set a dining budget alert for you?",
-      time: "10:05 AM"
-    },
-    {
-      id: 4,
-      sender: "user",
-      text: "Yes, please set an alert for ₹10,000 next month.",
-      time: "10:08 AM"
-    },
-    {
-      id: 5,
-      sender: "ai",
-      text: "Done! ✅ I've set a dining budget limit of ₹10,000 for next month. I'll notify you when you reach 80% of this limit.",
-      time: "10:09 AM"
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
   ]);
 
   const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!input.trim()) return;
     
     // Add user message
@@ -51,19 +28,41 @@ export default function ChatPage() {
     
     setMessages(prev => [...prev, newMessage]);
     setInput("");
+    setLoading(true);
     
-    // Simulate AI response
-    setTimeout(() => {
+    try {
+      const res = await fetch("http://localhost:8000/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ message: newMessage.text })
+      });
+      
+      const data = await res.json();
+      
       setMessages(prev => [
         ...prev,
         {
           id: prev.length + 1,
           sender: "ai",
-          text: "I'm analyzing your request. Since I'm currently running in demo mode, I can't process real-time data right now. Try checking the insights tab for more features!",
+          text: data.text || "Sorry, I couldn't understand that.",
+          time: data.time || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        }
+      ]);
+    } catch (error) {
+      setMessages(prev => [
+        ...prev,
+        {
+          id: prev.length + 1,
+          sender: "ai",
+          text: "Looks like the backend server is unreachable right now. Please ensure it's running on port 8000.",
           time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         }
       ]);
-    }, 1500);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -119,6 +118,20 @@ export default function ChatPage() {
             </div>
           </div>
         ))}
+        {loading && (
+          <div className="flex justify-start relative z-10">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-purple-600 flex-shrink-0 mr-3 mt-1 flex items-center justify-center">
+              <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <div className="bg-white/10 text-gray-100 rounded-2xl rounded-tl-sm border border-white/5 backdrop-blur-md px-5 py-3 shadow-lg flex items-center space-x-2">
+              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-75"></div>
+              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-150"></div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Input Area */}
@@ -140,19 +153,15 @@ export default function ChatPage() {
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask anything about your finances..."
               className="w-full bg-transparent px-4 py-4 text-white placeholder-gray-500 focus:outline-none"
+              disabled={loading}
             />
-            <button type="button" className="pr-4 text-gray-400 hover:text-white transition-colors">
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-              </svg>
-            </button>
           </div>
           
           <button 
             type="submit" 
-            disabled={!input.trim()}
+            disabled={!input.trim() || loading}
             className={`p-4 rounded-full flex-shrink-0 transition-all ${
-              input.trim() 
+              input.trim() && !loading
                 ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-purple-500/30' 
                 : 'bg-white/5 text-gray-500 cursor-not-allowed'
             }`}

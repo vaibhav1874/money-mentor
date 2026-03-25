@@ -1,42 +1,31 @@
+"use client";
+
+import { useState, useEffect } from "react";
+
 export default function SmartInsights() {
-  const insights = [
-    {
-      id: 1,
-      type: "alert",
-      title: "High Dining Expenses Detected",
-      description: "You've spent ₹14,500 on dining out this month, which is 45% higher than your average. Consider cooking at home to stay on budget.",
-      actionText: "Review Budget",
-      icon: "🍽️",
-      color: "red"
-    },
-    {
-      id: 2,
-      type: "opportunity",
-      title: "Tax Saving Opportunity",
-      description: "You haven't fully utilized your Section 80C limit. Investing ₹45,000 more can save you up to ₹14,040 in taxes this financial year.",
-      actionText: "Explore ELSS Funds",
-      icon: "💰",
-      color: "green"
-    },
-    {
-      id: 3,
-      type: "achievement",
-      title: "Emergency Fund On Track",
-      description: "Great job! You are consistently saving ₹8,000 per month towards your Emergency Fund. You will reach your goal 2 months earlier than planned.",
-      actionText: "View Goals",
-      icon: "⭐",
-      color: "yellow"
-    },
-    {
-      id: 4,
-      type: "insight",
-      title: "Subscription Audit",
-      description: "We noticed you are paying for 3 streaming services but haven't used Netflix in 45 days. Canceling could save you ₹7,800 annually.",
-      actionText: "Manage Subscriptions",
-      icon: "📺",
-      color: "purple"
+  const [insights, setInsights] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const res = await fetch('http://localhost:8000/api/insights');
+        if (res.ok) {
+          const json = await res.json();
+          setInsights(json);
+        }
+      } catch (error) {
+        console.error("Failed to fetch insights data", error);
+      } finally {
+        setLoading(false);
+      }
     }
-  ];
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return <div className="text-gray-400 animate-pulse p-4">Loading your smart AI insights...</div>;
+  }
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
@@ -63,7 +52,7 @@ export default function SmartInsights() {
         {/* Background glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-900/10 rounded-full mix-blend-screen filter blur-[100px] pointer-events-none"></div>
         
-        {insights.map((insight) => (
+        {insights.map((insight: any) => (
           <div key={insight.id} className="bg-white/5 border border-white/10 rounded-2xl p-6 relative overflow-hidden backdrop-blur-sm hover:bg-white/10 transition-colors group">
             <div className={`absolute top-0 right-0 w-32 h-32 bg-${insight.color}-500/10 rounded-full blur-2xl group-hover:bg-${insight.color}-500/20 transition-all`}></div>
             
