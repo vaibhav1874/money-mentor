@@ -1,15 +1,21 @@
+"use client";
 import Link from "next/link";
+import dynamic from 'next/dynamic';
+
+const ThreeDScene = dynamic(() => import('./ThreeDScene'), { ssr: false });
 
 export default function Hero() {
   return (
     <div className="relative pt-32 pb-20 sm:pt-40 sm:pb-24 lg:pb-32 overflow-hidden">
-      {/* Background gradients */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-[1000px] pointer-events-none">
-        <div className="absolute top-20 left-1/4 w-96 h-96 bg-blue-600/30 rounded-full mix-blend-screen filter blur-[100px] animate-pulse"></div>
-        <div className="absolute top-40 right-1/4 w-96 h-96 bg-purple-600/30 rounded-full mix-blend-screen filter blur-[100px] animate-pulse" style={{ animationDelay: '1s' }}></div>
+      {/* Background gradients and 3D Scene */}
+      <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-0">
+        <ThreeDScene />
+        {/* Subtle glow overlays to enhance lighting */}
+        <div className="absolute top-20 left-1/4 w-96 h-96 bg-blue-600/20 rounded-full mix-blend-screen filter blur-[100px] animate-pulse"></div>
+        <div className="absolute top-40 right-1/4 w-96 h-96 bg-purple-600/20 rounded-full mix-blend-screen filter blur-[100px] animate-pulse" style={{ animationDelay: '1s' }}></div>
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10">
         <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-white mb-8">
           Your AI Money Mentor for <br className="hidden md:block" />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
@@ -28,101 +34,123 @@ export default function Hero() {
           </Link>
         </div>
         
-        {/* Mockup visualization */}
-        <div className="mt-20 relative max-w-4xl mx-auto">
-          <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-2 shadow-2xl relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 to-purple-500/10 mix-blend-overlay"></div>
-            <div className="rounded-xl overflow-hidden bg-[#050505] aspect-[16/9] w-full relative border border-white/5 flex flex-col pointer-events-none shadow-2xl">
-              {/* Fake Topnav */}
-              <div className="h-10 sm:h-12 border-b border-white/10 flex items-center px-3 sm:px-4 justify-between bg-white/5">
-                <div className="flex gap-2 items-center">
-                  <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md bg-gradient-to-tr from-blue-500 to-purple-500"></div>
-                  <div className="text-white text-[10px] sm:text-xs font-bold hidden xs:block">MoneyMitra AI</div>
+        {/* Premium Dashboard Preview */}
+        <div className="mt-20 relative max-w-5xl mx-auto px-4">
+          <div className="relative rounded-3xl border border-white/20 bg-white/5 backdrop-blur-3xl p-3 sm:p-4 shadow-[0_30px_100px_rgba(0,0,0,0.5)] overflow-hidden">
+            {/* Ambient glows behind the mockup */}
+            <div className="absolute -top-20 -left-20 w-64 h-64 bg-blue-500/20 rounded-full blur-[80px]"></div>
+            <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-purple-500/20 rounded-full blur-[80px]"></div>
+
+            <div className="rounded-2xl overflow-hidden bg-[#0a0a0a]/90 aspect-[16/10] sm:aspect-[16/9] w-full relative border border-white/10 flex flex-col shadow-2xl">
+              {/* Animated scanning line */}
+              <div className="absolute inset-0 z-20 pointer-events-none overflow-hidden">
+                <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-blue-500 to-transparent absolute top-0 animate-[scan_4s_ease-in-out_infinite]"></div>
+              </div>
+
+              {/* Mockup Header */}
+              <div className="h-12 border-b border-white/10 flex items-center px-6 justify-between bg-white/5 backdrop-blur-md relative z-10">
+                <div className="flex gap-3 items-center">
+                  <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-blue-500 to-purple-600 shadow-lg shadow-blue-500/20 flex items-center justify-center">
+                    <div className="w-2.5 h-2.5 bg-white rounded-full animate-pulse"></div>
+                  </div>
+                  <div className="text-white text-sm font-bold tracking-tight">MoneyMitra <span className="text-blue-400">AI</span></div>
                 </div>
-                <div className="flex gap-2">
-                  <div className="w-16 sm:w-20 h-5 sm:h-6 bg-white/10 rounded-full"></div>
-                  <div className="w-5 h-5 sm:w-6 sm:h-6 bg-white/10 rounded-full"></div>
+                <div className="flex gap-4 items-center">
+                  <div className="hidden sm:flex gap-2">
+                    <div className="w-16 h-2 bg-white/10 rounded-full"></div>
+                    <div className="w-10 h-2 bg-white/10 rounded-full"></div>
+                  </div>
+                  <div className="w-8 h-8 bg-gradient-to-tr from-blue-500/20 to-purple-500/20 border border-white/10 rounded-full flex items-center justify-center">
+                    <div className="w-5 h-5 rounded-full bg-white/10"></div>
+                  </div>
                 </div>
               </div>
               
-              {/* Fake Layout */}
-              <div className="flex flex-1 overflow-hidden">
-                {/* Fake Sidebar */}
-                <div className="w-1/4 max-w-[140px] border-r border-white/10 p-3 sm:p-4 space-y-3 hidden md:block bg-black/50">
-                  <div className="h-3 bg-white/20 rounded w-3/4"></div>
-                  <div className="h-3 bg-white/10 rounded w-full"></div>
-                  <div className="h-3 bg-white/10 rounded w-5/6"></div>
-                  <div className="h-3 bg-white/10 rounded w-2/3"></div>
-                  <div className="h-3 bg-white/10 rounded w-4/5 mt-8"></div>
+              <div className="flex flex-1 overflow-hidden relative z-10">
+                {/* Mockup Sidebar */}
+                <div className="w-48 border-r border-white/10 p-6 space-y-6 hidden md:block bg-gradient-to-b from-white/5 to-transparent">
+                  <div className="space-y-4">
+                    <div className="h-2 bg-blue-400/40 rounded w-1/2"></div>
+                    <div className="h-2 bg-white/10 rounded w-full"></div>
+                    <div className="h-2 bg-white/10 rounded w-3/4"></div>
+                    <div className="h-2 bg-white/10 rounded w-5/6"></div>
+                  </div>
+                  <div className="pt-8 space-y-4">
+                    <div className="h-2 bg-purple-400/30 rounded w-2/3"></div>
+                    <div className="h-2 bg-white/10 rounded w-full"></div>
+                    <div className="h-2 bg-white/10 rounded w-4/5"></div>
+                  </div>
                 </div>
                 
-                {/* Fake Main Area */}
-                <div className="flex-1 p-3 sm:p-5 space-y-3 sm:space-y-4 flex flex-col">
-                   <div className="flex justify-between items-center">
-                     <div className="h-4 sm:h-5 bg-white/20 rounded w-1/3 max-w-[150px]"></div>
-                     <div className="h-6 sm:h-8 bg-blue-500/20 border border-blue-500/30 rounded-md sm:rounded-lg w-16 sm:w-24"></div>
-                   </div>
-                   
-                   {/* Fake Cards */}
-                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
-                     <div className="bg-white/5 border border-white/10 h-14 sm:h-16 rounded-lg sm:rounded-xl p-2 sm:p-3 flex flex-col justify-center">
-                       <div className="h-1.5 sm:h-2 bg-gray-500 rounded w-1/2 mb-1 sm:mb-2"></div>
-                       <div className="h-3 sm:h-4 bg-white rounded w-3/4"></div>
+                {/* Mockup Content */}
+                <div className="flex-1 p-6 space-y-6 flex flex-col overflow-hidden">
+                   <div className="flex justify-between items-end">
+                     <div className="space-y-2">
+                       <div className="h-3 bg-white/20 rounded w-32"></div>
+                       <div className="h-7 bg-white/10 rounded w-48"></div>
                      </div>
-                     <div className="bg-white/5 border border-white/10 h-14 sm:h-16 rounded-lg sm:rounded-xl p-2 sm:p-3 flex flex-col justify-center">
-                       <div className="h-1.5 sm:h-2 bg-gray-500 rounded w-1/2 mb-1 sm:mb-2"></div>
-                       <div className="h-3 sm:h-4 bg-green-400 rounded w-5/6"></div>
-                     </div>
-                     <div className="bg-white/5 border border-white/10 h-14 sm:h-16 rounded-lg sm:rounded-xl p-2 sm:p-3 flex flex-col justify-center hidden sm:flex">
-                       <div className="h-1.5 sm:h-2 bg-gray-500 rounded w-1/2 mb-1 sm:mb-2"></div>
-                       <div className="h-3 sm:h-4 bg-red-400 rounded w-2/3"></div>
-                     </div>
-                     <div className="bg-white/5 border border-white/10 h-14 sm:h-16 rounded-lg sm:rounded-xl p-2 sm:p-3 flex flex-col justify-center hidden lg:flex">
-                       <div className="h-1.5 sm:h-2 bg-gray-500 rounded w-1/2 mb-1 sm:mb-2"></div>
-                       <div className="h-3 sm:h-4 bg-white rounded w-full"></div>
+                     <div className="h-10 bg-blue-600/20 border border-blue-500/40 rounded-xl w-32 flex items-center justify-center">
+                       <div className="h-2 bg-blue-400 rounded w-16"></div>
                      </div>
                    </div>
                    
-                   {/* Fake Bottom Area */}
-                   <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 overflow-hidden">
-                     {/* Fake Score */}
-                     <div className="col-span-1 border border-white/10 bg-white/5 rounded-lg sm:rounded-xl flex items-center justify-center p-2 sm:p-4">
-                       <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-full border-[3px] sm:border-4 border-white/10 border-t-blue-500 border-r-blue-500 relative flex items-center justify-center">
-                         <span className="text-sm sm:text-xl font-bold text-white">92</span>
+                   {/* Grid Cards */}
+                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                     {[
+                       { color: 'blue', val: '75%' },
+                       { color: 'green', val: '12%' },
+                       { color: 'red', val: '45%' },
+                       { color: 'purple', val: 'OK' }
+                     ].map((c, i) => (
+                       <div key={i} className="bg-white/5 border border-white/10 h-20 rounded-2xl p-4 flex flex-col justify-between hover:bg-white/10 transition-colors">
+                         <div className={`h-2 bg-${c.color}-500/30 rounded w-12`}></div>
+                         <div className="flex justify-between items-end">
+                           <div className="h-5 bg-white/10 rounded w-16"></div>
+                           <span className={`text-[10px] font-bold text-${c.color}-400`}>{c.val}</span>
+                         </div>
                        </div>
+                     ))}
+                   </div>
+                   
+                   <div className="flex-1 grid grid-cols-1 lg:grid-cols-5 gap-6 overflow-hidden">
+                     {/* Health Score Circle */}
+                     <div className="lg:col-span-2 border border-blue-500/20 bg-blue-500/5 rounded-2xl flex flex-col items-center justify-center p-6 relative group">
+                        <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <div className="relative w-32 h-32 flex items-center justify-center">
+                          <svg className="w-full h-full transform -rotate-90">
+                            <circle cx="64" cy="64" r="58" stroke="currentColor" strokeWidth="8" fill="transparent" className="text-white/5" />
+                            <circle cx="64" cy="64" r="58" stroke="currentColor" strokeWidth="8" fill="transparent" strokeDasharray="364" strokeDashoffset="40" className="text-blue-500 drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
+                          </svg>
+                          <div className="absolute flex flex-col items-center">
+                            <span className="text-4xl font-black text-white">92</span>
+                            <span className="text-[10px] text-blue-400 font-bold tracking-widest uppercase">Excellent</span>
+                          </div>
+                        </div>
                      </div>
                      
-                     {/* Fake List */}
-                     <div className="col-span-1 sm:col-span-2 border border-white/10 bg-white/5 rounded-lg sm:rounded-xl p-3 sm:p-4 space-y-2 sm:space-y-3 flex flex-col">
-                       <div className="h-3 sm:h-4 bg-white/20 w-1/3 sm:w-1/4 rounded mb-1 sm:mb-2"></div>
-                       <div className="h-6 sm:h-8 bg-black/40 border border-white/5 rounded-md sm:rounded-lg flex items-center px-2 sm:px-3 justify-between">
-                         <div className="flex gap-2 items-center">
-                           <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-red-400/20"></div>
-                           <div className="w-12 sm:w-16 h-1.5 sm:h-2 bg-white/20 rounded"></div>
-                         </div>
-                         <div className="w-8 sm:w-12 h-1.5 sm:h-2 bg-white/40 rounded"></div>
-                       </div>
-                       <div className="h-6 sm:h-8 bg-black/40 border border-white/5 rounded-md sm:rounded-lg flex items-center px-2 sm:px-3 justify-between">
-                         <div className="flex gap-2 items-center">
-                           <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-green-400/20"></div>
-                           <div className="w-10 sm:w-12 h-1.5 sm:h-2 bg-white/20 rounded"></div>
-                         </div>
-                         <div className="w-10 sm:w-16 h-1.5 sm:h-2 bg-green-400/40 rounded"></div>
-                       </div>
-                       <div className="h-6 sm:h-8 bg-black/40 border border-white/5 rounded-md sm:rounded-lg flex items-center px-2 sm:px-3 justify-between hidden sm:flex">
-                         <div className="flex gap-2 items-center">
-                           <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-red-400/20"></div>
-                           <div className="w-14 sm:w-20 h-1.5 sm:h-2 bg-white/20 rounded"></div>
-                         </div>
-                         <div className="w-6 sm:w-10 h-1.5 sm:h-2 bg-white/40 rounded"></div>
-                       </div>
+                     {/* Recent Activities */}
+                     <div className="lg:col-span-3 border border-white/10 bg-white/5 rounded-2xl p-6 space-y-4">
+                        <div className="h-3 bg-white/20 w-32 rounded mb-4"></div>
+                        {[1, 2, 3].map(i => (
+                          <div key={i} className="h-10 bg-black/40 border border-white/5 rounded-xl flex items-center px-4 justify-between group hover:border-white/10 transition-colors">
+                            <div className="flex gap-4 items-center">
+                              <div className={`w-3 h-3 rounded-full ${i === 1 ? 'bg-red-400' : 'bg-green-400'} animate-pulse`}></div>
+                              <div className="w-32 h-2.5 bg-white/10 rounded"></div>
+                            </div>
+                            <div className="w-16 h-2.5 bg-white/20 rounded"></div>
+                          </div>
+                        ))}
                      </div>
                    </div>
                 </div>
               </div>
             </div>
           </div>
+          {/* Decorative elements around mockup */}
+          <div className="absolute -top-10 -right-10 w-20 h-20 bg-gradient-to-tr from-yellow-500/40 to-orange-500/40 rounded-full blur-2xl animate-pulse"></div>
+          <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-gradient-to-tr from-blue-500/30 to-purple-500/30 rounded-full blur-3xl animate-pulse"></div>
         </div>
+
       </div>
     </div>
   );
