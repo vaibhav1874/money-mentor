@@ -14,24 +14,30 @@ export default function SmartInsights() {
     const fetchAIGeneratedInsights = async (userUid: string) => {
       try {
         setLoading(true);
-        // Step 1: Fetch real user transactions from Firestore
+        // Step 1: Fetch real user transactions from Firestore without requiring a composite index
         const q = query(
           collection(db, "transactions"), 
-          where("userId", "==", userUid),
-          orderBy("createdAt", "desc"),
-          limit(30) // Analyze last 30
+          where("userId", "==", userUid)
         );
         const snapshot = await getDocs(q);
-        const txs: any[] = [];
+        const allTxs: any[] = [];
         snapshot.forEach(doc => {
-          const data = doc.data();
-          txs.push({
-            type: data.type,
-            amount: data.amount,
-            category: data.category,
-            date: data.date
-          });
+          allTxs.push(doc.data());
         });
+        
+        // Sort locally and extract most recent 30
+        allTxs.sort((a, b) => {
+           const tA = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+           const tB = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+           return tB - tA;
+        });
+        
+        const txs = allTxs.slice(0, 30).map(data => ({
+          type: data.type,
+          amount: data.amount,
+          category: data.category,
+          date: data.date
+        }));
 
         // Step 2: Send them to Python Backend to prompt Gemini
         const res = await fetch('http://localhost:8000/api/generate-insights', {

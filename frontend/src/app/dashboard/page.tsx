@@ -19,9 +19,7 @@ export default function DashboardPage() {
       if (user) {
         const q = query(
           collection(db, "transactions"), 
-          where("userId", "==", user.uid),
-          orderBy("createdAt", "desc"),
-          limit(50)
+          where("userId", "==", user.uid)
         );
         
         const unsubscribeSnapshot = onSnapshot(q, (snapshot) => {
@@ -37,7 +35,14 @@ export default function DashboardPage() {
             if (data.type === "Expense") totalExpense += data.amount;
           });
           
-          setTransactions(txs);
+          // Sort locally to avoid needing a Firestore composite index
+          txs.sort((a, b) => {
+             const timeA = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+             const timeB = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+             return timeB - timeA;
+          });
+          
+          setTransactions(txs.slice(0, 50));
           
           let score = 50; 
           if (totalIncome > 0) {

@@ -22,8 +22,8 @@ app.add_middleware(
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip("\"'")
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
-    # Using gemini-1.5-pro or gemini-pro
-    model = genai.GenerativeModel('gemini-1.5-pro')
+    # Trying the least-cost model to bypass free-tier Quota limits
+    model = genai.GenerativeModel('gemini-flash-lite-latest')
 else:
     model = None
 

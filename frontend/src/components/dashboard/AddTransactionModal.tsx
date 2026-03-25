@@ -80,14 +80,20 @@ export default function AddTransactionModal() {
                   <div className="flex gap-2">
                     <button 
                       type="button" 
-                      onClick={() => setType("Expense")}
+                      onClick={() => {
+                        setType("Expense");
+                        setCategory("Food & Dining");
+                      }}
                       className={`flex-1 py-2 ${type === 'Expense' ? 'bg-red-500/20 text-red-400 border-red-500/30' : 'bg-white/5 text-gray-400 border-white/10'} border rounded-xl font-medium text-sm transition-all`}
                     >
                       Expense
                     </button>
                     <button 
                       type="button" 
-                      onClick={() => setType("Income")}
+                      onClick={() => {
+                        setType("Income");
+                        setCategory("Salary");
+                      }}
                       className={`flex-1 py-2 ${type === 'Income' ? 'bg-green-500/20 text-green-400 border-green-500/30' : 'bg-white/5 text-gray-400 border-white/10'} border rounded-xl font-medium text-sm transition-all`}
                     >
                       Income
@@ -119,13 +125,24 @@ export default function AddTransactionModal() {
                       className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:ring-1 focus:ring-purple-500" 
                       required
                     >
-                      <option>Food & Dining</option>
-                      <option>Shopping</option>
-                      <option>Transport</option>
-                      <option>Salary</option>
-                      <option>Investment Return</option>
-                      <option>Bills</option>
-                      <option>Other</option>
+                      {type === "Expense" ? (
+                        <>
+                          <option>Food & Dining</option>
+                          <option>Shopping</option>
+                          <option>Transport</option>
+                          <option>Bills</option>
+                          <option>Entertainment</option>
+                          <option>Other Expense</option>
+                        </>
+                      ) : (
+                        <>
+                          <option>Salary</option>
+                          <option>Freelance</option>
+                          <option>Investment Return</option>
+                          <option>Gift</option>
+                          <option>Other Income</option>
+                        </>
+                      )}
                     </select>
                   </div>
                   <div className="space-y-2">

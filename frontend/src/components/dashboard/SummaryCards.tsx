@@ -26,12 +26,12 @@ export default function SummaryCards() {
             else if (data.type === "Expense") expense += data.amount;
           });
           
-          // Using base mock values + real-time additions to demonstrate functionality
+          // Using exactly what is in Firestore (no mock offsets)
           setData({
-             totalBalance: `₹${(1245000 + income - expense).toLocaleString('en-IN')}`,
-             monthlyIncome: `₹${(185000 + income).toLocaleString('en-IN')}`,
-             monthlyExpenses: `₹${(65400 + expense).toLocaleString('en-IN')}`,
-             totalInvestments: "₹8,50,000",
+             totalBalance: `₹${(income - expense).toLocaleString('en-IN')}`,
+             monthlyIncome: `₹${income.toLocaleString('en-IN')}`,
+             monthlyExpenses: `₹${expense.toLocaleString('en-IN')}`,
+             totalInvestments: "₹0", // Extend this if you add an Investments category mapping
           });
           setLoading(false);
         }, (error) => {
