@@ -8,15 +8,20 @@ import SpendingAnalyticsChart from "@/components/dashboard/SpendingAnalyticsChar
 import BankStatementUpload from "@/components/dashboard/BankStatementUpload";
 import BankConnectModal from "@/components/dashboard/BankConnectModal";
 import IntelligencePanel from "@/components/dashboard/IntelligencePanel";
+import SubscriptionTracker from "@/components/dashboard/SubscriptionTracker";
 import { db, auth } from "@/lib/firebase";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { ShieldCheck, Zap } from "lucide-react";
+import { useDashboard } from "@/context/DashboardContext";
 
 export default function DashboardPage() {
-  const [transactions, setTransactions] = useState<any[]>([]);
-  const [healthScore, setHealthScore] = useState(0);
-  const [isDemoMode, setIsDemoMode] = useState(false);
+  const { 
+    transactions, setTransactions, 
+    isDemoMode, setIsDemoMode, 
+    healthScore, setHealthScore 
+  } = useDashboard();
+  
   const [isBankModalOpen, setIsBankModalOpen] = useState(false);
   const [importedData, setImportedData] = useState<any[]>([]);
   const [metrics, setMetrics] = useState<any>({
@@ -217,6 +222,8 @@ export default function DashboardPage() {
         <div className="xl:col-span-1 space-y-6">
           <BankStatementUpload onDataImported={handleDataImported} />
           
+          <SubscriptionTracker transactions={transactions} />
+
           <div className="bg-gradient-to-br from-blue-600/20 to-purple-600/20 border border-white/10 rounded-2xl p-6 backdrop-blur-sm relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-all"></div>
             <h3 className="text-lg font-bold text-white mb-2 leading-snug">Connect Your Bank</h3>
