@@ -1,3 +1,5 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
 # dependencies
 node_modules/
 /.pnp
@@ -14,7 +16,6 @@ node_modules/
 # next.js
 .next/
 out/
-build/
 
 # production
 /build
@@ -22,23 +23,18 @@ build/
 # misc
 .DS_Store
 *.pem
-*.swp
-*.swo
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
 
 # debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
-*.log
-frontend_log.txt
-lint_output.txt
-eslint_report.json
+
+# env files (can opt-in for committing if needed)
+.env*
+
+# vercel
+.vercel
 
 # typescript
 *.tsbuildinfo
@@ -46,13 +42,5 @@ next-env.d.ts
 
 # python
 venv/
-.venv/
-env/
 __pycache__/
 *.pyc
-*.pyo
-*.pyd
-.pytest_cache/
-.tox/
-.analytics/
-.ruff_cache/
