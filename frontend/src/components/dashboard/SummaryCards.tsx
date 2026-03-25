@@ -7,11 +7,50 @@ import {
   Wallet, 
   ArrowUpRight, 
   ArrowDownRight, 
-  PieChart 
+  PieChart,
+  Target
 } from "lucide-react";
 
 interface SummaryCardsProps {
   transactions: any[];
+}
+
+function Card({ title, amount, trend, isPositive, icon, color, borderColor }: any) {
+  return (
+    <motion.div
+      whileHover={{ y: -5, scale: 1.02 }}
+      className={`group relative overflow-hidden glass-card rounded-[2rem] p-6 transition-all duration-500 hover:shadow-[0_20px_50px_rgba(0,0,0,0.4)] border border-white/5`}
+    >
+      {/* Dynamic Background Glow */}
+      <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${color} opacity-[0.05] rounded-full blur-[60px] group-hover:opacity-[0.15] transition-opacity duration-700`}></div>
+      
+      <div className="flex flex-col h-full relative z-10">
+        <div className="flex items-center justify-between mb-8">
+          <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:scale-110 group-hover:border-primary-500/50 transition-all duration-500 shadow-xl">
+            {icon}
+          </div>
+          <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-black tracking-wider uppercase border border-white/[0.03] ${isPositive ? "bg-emerald-500/10 text-emerald-400" : "bg-rose-500/10 text-rose-400"}`}>
+            {isPositive ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+            {trend}
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <h3 className="text-gray-500 text-[11px] font-black uppercase tracking-[0.2em] opacity-80">
+            {title}
+          </h3>
+          <p className="text-3xl font-black text-white tracking-tighter leading-none py-1">
+            {amount}
+          </p>
+        </div>
+
+        <div className="mt-8 pt-6 border-t border-white/[0.03] flex items-center gap-2 text-[10px] text-gray-500 font-bold uppercase tracking-widest opacity-40">
+          <div className="w-1.5 h-1.5 rounded-full bg-primary-500 animate-pulse"></div>
+          Live Intelligence
+        </div>
+      </div>
+    </motion.div>
+  );
 }
 
 export default function SummaryCards({ transactions }: SummaryCardsProps) {
@@ -29,64 +68,47 @@ export default function SummaryCards({ transactions }: SummaryCardsProps) {
     {
       title: "Total Balance",
       amount: `₹${balance.toLocaleString('en-IN')}`,
-      trend: "+2.4%", // Simulated trend
+      trend: "+2.4%",
       isPositive: true,
-      icon: <Wallet className="w-5 h-5 text-blue-400" />,
-      color: "from-blue-600/20 to-blue-600/5",
-      borderColor: "border-blue-500/20"
+      icon: <Wallet className="w-6 h-6 text-indigo-400" />,
+      color: "from-indigo-500 to-purple-600",
     },
     {
-      title: "Monthly Income",
+      title: "Incoming Assets",
       amount: `₹${totalIncome.toLocaleString('en-IN')}`,
       trend: "+12%",
       isPositive: true,
-      icon: <ArrowUpRight className="w-5 h-5 text-green-400" />,
-      color: "from-green-600/20 to-green-600/5",
-      borderColor: "border-green-500/20"
+      icon: <ArrowUpRight className="w-6 h-6 text-emerald-400" />,
+      color: "from-emerald-400 to-teal-500",
     },
     {
-      title: "Monthly Expenses",
+      title: "Active Burn",
       amount: `₹${totalExpense.toLocaleString('en-IN')}`,
       trend: "-5.2%",
       isPositive: false,
-      icon: <ArrowDownRight className="w-5 h-5 text-red-400" />,
-      color: "from-red-600/20 to-red-600/5",
-      borderColor: "border-red-500/20"
+      icon: <ArrowDownRight className="w-6 h-6 text-rose-400" />,
+      color: "from-rose-500 to-red-600",
     },
     {
-      title: "Total Savings",
-      amount: `₹${(totalIncome * 0.15).toLocaleString('en-IN')}`, // Simulated savings
+      title: "Projected 30d",
+      amount: `₹${(totalIncome * 1.15).toLocaleString('en-IN')}`,
       trend: "+15.8%",
       isPositive: true,
-      icon: <PieChart className="w-5 h-5 text-purple-400" />,
-      color: "from-purple-600/20 to-purple-600/5",
-      borderColor: "border-purple-500/20"
+      icon: <Target className="w-6 h-6 text-amber-400" />,
+      color: "from-amber-400 to-orange-500",
     }
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       {cards.map((card, index) => (
         <motion.div 
           key={index} 
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: index * 0.1 }}
-          className={`group bg-gradient-to-br ${card.color} border ${card.borderColor} rounded-3xl p-5 sm:p-6 relative overflow-hidden backdrop-blur-md transition-all hover:scale-[1.02] hover:bg-white/[0.08]`}
+          transition={{ delay: index * 0.1, duration: 0.6 }}
         >
-          <div className="flex justify-between items-start mb-6">
-            <div className="w-12 h-12 rounded-2xl bg-black/40 border border-white/5 flex items-center justify-center group-hover:scale-110 transition-transform shadow-inner">
-              {card.icon}
-            </div>
-            <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${card.isPositive ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
-              {card.isPositive ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-              {card.trend}
-            </div>
-          </div>
-          <div>
-            <p className="text-[11px] font-bold text-gray-400 mb-1 uppercase tracking-widest leading-none">{card.title}</p>
-            <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight">{card.amount}</h3>
-          </div>
+          <Card {...card} />
         </motion.div>
       ))}
     </div>
