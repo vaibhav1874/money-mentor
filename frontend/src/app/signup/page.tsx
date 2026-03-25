@@ -1,23 +1,49 @@
 "use client";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { signInWithPopup } from "firebase/auth";
+import { signInWithPopup, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth, googleProvider } from "@/lib/firebase";
 
 export default function SignupPage() {
   const router = useRouter();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleGoogleLogin = async () => {
     try {
+      setLoading(true);
       await signInWithPopup(auth, googleProvider);
       router.push("/dashboard");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error signing in with Google", error);
+      setError(error.message);
+    } finally {
+      setLoading(false);
     }
   };
+
+  const handleEmailSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      setError("");
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      await updateProfile(userCredential.user, { displayName: name });
+      router.push("/dashboard");
+    } catch (error: any) {
+      console.error("Error signing up with email", error);
+      setError(error.message || "Failed to create account. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-black flex">
-      {/* Left side: Form */}
       <div className="flex-1 flex flex-col justify-center px-4 sm:px-6 lg:flex-none lg:w-1/2 xl:w-5/12 mx-auto lg:mx-0 lg:px-20 xl:px-24">
         <div className="mx-auto w-full max-w-sm lg:w-96">
           <div>
@@ -35,7 +61,12 @@ export default function SignupPage() {
 
           <div className="mt-8">
             <div className="mt-6">
-              <form action="#" method="POST" className="space-y-6">
+              <form onSubmit={handleEmailSignup} className="space-y-6">
+                {error && (
+                  <div className="bg-red-500/10 border border-red-500/20 text-red-500 px-4 py-3 rounded-xl text-sm italic">
+                    {error}
+                  </div>
+                )}
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-gray-300">
                     Full Name
@@ -51,6 +82,8 @@ export default function SignupPage() {
                       name="name"
                       type="text"
                       required
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
                       className="block w-full pl-10 pr-3 py-3 border border-gray-700 rounded-xl leading-5 bg-white/5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors"
                       placeholder="John Doe"
                     />
@@ -71,8 +104,9 @@ export default function SignupPage() {
                       id="email"
                       name="email"
                       type="email"
-                      autoComplete="email"
                       required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
                       className="block w-full pl-10 pr-3 py-3 border border-gray-700 rounded-xl leading-5 bg-white/5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors"
                       placeholder="you@example.com"
                     />
@@ -94,6 +128,8 @@ export default function SignupPage() {
                       name="password"
                       type="password"
                       required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
                       className="block w-full pl-10 pr-3 py-3 border border-gray-700 rounded-xl leading-5 bg-white/5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors"
                       placeholder="••••••••"
                     />
@@ -101,9 +137,17 @@ export default function SignupPage() {
                 </div>
 
                 <div>
-                  <Link href="/dashboard" className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 focus:ring-offset-black transition-all">
-                    Create Account
-                  </Link>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full h-12 flex justify-center items-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 focus:ring-offset-black transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {loading ? (
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    ) : (
+                      "Create Account"
+                    )}
+                  </button>
                 </div>
               </form>
 
@@ -121,7 +165,8 @@ export default function SignupPage() {
                   <button
                     type="button"
                     onClick={handleGoogleLogin}
-                    className="w-full flex justify-center items-center py-3 px-4 rounded-xl border border-gray-700 bg-white/5 hover:bg-white/10 text-white font-medium text-sm transition-colors"
+                    disabled={loading}
+                    className="w-full flex justify-center items-center py-3 px-4 rounded-xl border border-gray-700 bg-white/5 hover:bg-white/10 text-white font-medium text-sm transition-colors disabled:opacity-50"
                   >
                     <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -137,15 +182,12 @@ export default function SignupPage() {
           </div>
         </div>
       </div>
-      
-      {/* Right side: Graphic */}
       <div className="hidden lg:block relative w-full flex-1 overflow-hidden pointer-events-none">
         <div className="absolute inset-0 bg-gradient-to-bl from-purple-900/20 via-black to-blue-900/20 mix-blend-overlay"></div>
         <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-purple-600/20 rounded-full mix-blend-screen filter blur-[100px]"></div>
         <div className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-blue-600/20 rounded-full mix-blend-screen filter blur-[100px]"></div>
-        
         <div className="absolute inset-0 flex items-center justify-center p-12">
-          <div className="max-w-md bg-white/5 border border-white/10 backdrop-blur-xl p-8 rounded-2xl shadow-2xl">
+          <div className="max-w-md bg-white/5 border border-white/10 backdrop-blur-xl p-8 rounded-2xl shadow-2xl transition-all">
             <div className="flex gap-4 mb-6">
               <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center">
                 <svg className="w-6 h-6 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
