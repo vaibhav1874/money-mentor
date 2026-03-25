@@ -1,6 +1,20 @@
+"use client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { signInWithPopup } from "firebase/auth";
+import { auth, googleProvider } from "@/lib/firebase";
 
 export default function SignupPage() {
+  const router = useRouter();
+
+  const handleGoogleLogin = async () => {
+    try {
+      await signInWithPopup(auth, googleProvider);
+      router.push("/dashboard");
+    } catch (error) {
+      console.error("Error signing in with Google", error);
+    }
+  };
   return (
     <div className="min-h-screen bg-black flex">
       {/* Left side: Form */}
@@ -106,6 +120,7 @@ export default function SignupPage() {
                 <div className="mt-6 grid grid-cols-1 gap-3">
                   <button
                     type="button"
+                    onClick={handleGoogleLogin}
                     className="w-full flex justify-center items-center py-3 px-4 rounded-xl border border-gray-700 bg-white/5 hover:bg-white/10 text-white font-medium text-sm transition-colors"
                   >
                     <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">

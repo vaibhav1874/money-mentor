@@ -81,9 +81,50 @@ def add_transaction(transaction: Transaction):
 def get_goals():
     return goals_data
 
-@app.get("/api/insights")
-def get_insights():
-    return insights_data
+import json
+
+class TransactionsPayload(BaseModel):
+    transactions: list[dict]
+
+@app.post("/api/generate-insights")
+def generate_insights(payload: TransactionsPayload):
+    if not model or not payload.transactions:
+        # Fallback to local hardcoded mock logic if no API key or no transactions
+        return insights_data
+        
+    try:
+        # Prepare context payload
+        context_data = json.dumps(payload.transactions[:50]) # Limit to last 50 for token limits
+        prompt = f"""
+        You are MoneyMitra, an expert AI financial advisor. 
+        Analyze the user's recent transactions: {context_data}
+        
+        Generate exactly 4 personalized financial insights in strict JSON array format.
+        Return ONLY the raw JSON array string. Do not use Markdown code blocks (no ```json).
+        
+        Required schema for each object:
+        - "id": integer
+        - "type": string (must be one of: "alert", "opportunity", "achievement", "insight")
+        - "title": string (catchy, 3-5 words)
+        - "description": string (detailed financial observation and advice based on their specific transaction amounts/categories)
+        - "actionText": string (short CTA, 2-3 words)
+        - "icon": string (only 1 relevant emoji)
+        - "color": string (must be "red" for alert, "green" for opportunity, "yellow" for achievement, "purple" for insight)
+        """
+        
+        response = model.generate_content(prompt)
+        text = response.text.strip()
+        
+        # Strip markdown syntax if Gemini hallucinated it
+        if text.startswith("```json"):
+            text = text[7:-3].strip()
+        elif text.startswith("```"):
+            text = text[3:-3].strip()
+            
+        return json.loads(text)
+    except Exception as e:
+        print(f"Gemini Insights Error: {e}")
+        return insights_data
 
 @app.post("/api/chat")
 def process_chat(chat: ChatMessage):

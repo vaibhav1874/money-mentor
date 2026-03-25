@@ -1,27 +1,53 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { db, auth } from "@/lib/firebase";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
+import { useRouter } from "next/navigation";
 
 export default function SummaryCards() {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const res = await fetch('http://localhost:8000/api/summary');
-        if (res.ok) {
-          const json = await res.json();
-          setData(json);
-        }
-      } catch (error) {
-        console.error("Failed to fetch summary data", error);
-      } finally {
-        setLoading(false);
+    const unsubscribeAuth = auth.onAuthStateChanged((user) => {
+      if (user) {
+        // User is signed in, set up snapshot listener for real-time transactions
+        const q = query(collection(db, "transactions"), where("userId", "==", user.uid));
+        
+        const unsubscribeSnapshot = onSnapshot(q, (snapshot) => {
+          let income = 0;
+          let expense = 0;
+          
+          snapshot.forEach(doc => {
+            const data = doc.data();
+            if (data.type === "Income") income += data.amount;
+            else if (data.type === "Expense") expense += data.amount;
+          });
+          
+          // Using base mock values + real-time additions to demonstrate functionality
+          setData({
+             totalBalance: `₹${(1245000 + income - expense).toLocaleString('en-IN')}`,
+             monthlyIncome: `₹${(185000 + income).toLocaleString('en-IN')}`,
+             monthlyExpenses: `₹${(65400 + expense).toLocaleString('en-IN')}`,
+             totalInvestments: "₹8,50,000",
+          });
+          setLoading(false);
+        }, (error) => {
+          console.error("Firestore Error:", error);
+          setLoading(false);
+        });
+        
+        return () => unsubscribeSnapshot();
+      } else {
+        // Not logged in, redirect to login
+        router.push("/login");
       }
-    }
-    fetchData();
-  }, []);
+    });
+
+    return () => unsubscribeAuth();
+  }, [router]);
 
   const cards = [
     {
@@ -79,7 +105,7 @@ export default function SummaryCards() {
   ];
 
   if (loading) {
-    return <div className="text-gray-400 text-sm animate-pulse">Loading Summary...</div>;
+    return <div className="text-gray-400 text-sm animate-pulse">Loading Live Firestore Database...</div>;
   }
 
   return (

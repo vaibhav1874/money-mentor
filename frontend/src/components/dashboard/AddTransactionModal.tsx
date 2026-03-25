@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { db, auth } from "@/lib/firebase";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { useRouter } from "next/navigation";
 
 export default function AddTransactionModal() {
   const [isOpen, setIsOpen] = useState(false);
@@ -10,25 +13,35 @@ export default function AddTransactionModal() {
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [note, setNote] = useState("");
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     
+    if (!auth.currentUser) {
+      alert("You must be logged in to add a transaction.");
+      router.push("/login");
+      return;
+    }
+
+    setLoading(true);
     try {
-      const res = await fetch('http://localhost:8000/api/transactions', {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type, amount: Number(amount), category, date, note })
+      await addDoc(collection(db, "transactions"), {
+        userId: auth.currentUser.uid,
+        type,
+        amount: Number(amount),
+        category,
+        date,
+        note,
+        createdAt: serverTimestamp()
       });
       
-      if (res.ok) {
-        setIsOpen(false);
-        // Dispatch an event or refresh the page to update widgets in a real app
-        window.location.reload(); 
-      }
+      setIsOpen(false);
+      setAmount("");
+      setNote("");
     } catch (error) {
-      console.error("Failed to add transaction", error);
+      console.error("Failed to add transaction to Firestore", error);
+      alert("Error adding transaction. Missing permissions or offline?");
     } finally {
       setLoading(false);
     }
@@ -143,7 +156,7 @@ export default function AddTransactionModal() {
                   disabled={loading}
                   className="w-full py-3 bg-white text-black font-bold rounded-xl mt-6 hover:bg-gray-200 transition-colors disabled:opacity-50"
                 >
-                  {loading ? "Adding..." : "Add Transaction"}
+                  {loading ? "Syncing to Cloud..." : "Add Transaction"}
                 </button>
               </form>
             </div>
