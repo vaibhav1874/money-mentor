@@ -9,6 +9,7 @@ import BankStatementUpload from "@/components/dashboard/BankStatementUpload";
 import BankConnectModal from "@/components/dashboard/BankConnectModal";
 import IntelligencePanel from "@/components/dashboard/IntelligencePanel";
 import SubscriptionTracker from "@/components/dashboard/SubscriptionTracker";
+import AdvancedIntelligence from "@/components/dashboard/AdvancedIntelligence";
 import { db, auth } from "@/lib/firebase";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { useRouter } from "next/navigation";
@@ -176,6 +177,12 @@ export default function DashboardPage() {
           <SummaryCards transactions={transactions} />
           
           <IntelligencePanel metrics={metrics} />
+
+          <AdvancedIntelligence 
+            savingsRate={metrics.savingsRatio}
+            monthlyIncome={metrics.thisMonthIncome}
+            monthlyExpense={metrics.thisMonthExpense}
+          />
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <MoneyHealthScore score={healthScore} />
