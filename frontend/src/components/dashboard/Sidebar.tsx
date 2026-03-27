@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useDashboard } from "@/context/DashboardContext";
 import { 
   LayoutDashboard, 
   MessageSquareText, 
   Target, 
   Zap, 
-  User, 
+  User as UserIcon, 
   Sparkles, 
   ArrowUpRight 
 } from "lucide-react";
@@ -15,6 +16,9 @@ import { motion } from "framer-motion";
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const { user } = useDashboard();
+
+  const userName = user?.displayName || user?.email?.split('@')[0] || "Vaibhav";
 
   const navItems = [
     {
@@ -40,7 +44,7 @@ export default function Sidebar() {
     {
       name: "Profile",
       href: "/dashboard/profile",
-      icon: User,
+      icon: UserIcon,
     }
   ];
 
@@ -114,17 +118,20 @@ export default function Sidebar() {
         </div>
       </div>
       
-      <div className="p-6 border-t border-white/5">
+      <Link 
+        href="/dashboard/profile"
+        className="p-6 border-t border-white/5 block hover:bg-white/5 transition-colors"
+      >
         <div className="flex items-center gap-3 px-2">
           <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-gray-800 to-gray-900 border border-white/10 flex items-center justify-center overflow-hidden">
-            <User className="w-5 h-5 text-gray-400" />
+            <UserIcon className="w-5 h-5 text-gray-400" />
           </div>
           <div className="flex flex-col">
-            <span className="text-sm font-bold text-white leading-none">Vaibhav</span>
+            <span className="text-sm font-bold text-white leading-none truncate max-w-[120px]">{userName}</span>
             <span className="text-[10px] text-gray-500 mt-1 uppercase tracking-widest font-medium">Free Tier</span>
           </div>
         </div>
-      </div>
+      </Link>
     </div>
   );
 }

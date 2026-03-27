@@ -1,8 +1,11 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { auth } from "@/lib/firebase";
+import { onAuthStateChanged, User } from "firebase/auth";
 
 interface DashboardContextType {
+  user: User | null;
   transactions: any[];
   setTransactions: (txs: any[]) => void;
   isDemoMode: boolean;
@@ -14,12 +17,21 @@ interface DashboardContextType {
 const DashboardContext = createContext<DashboardContextType | undefined>(undefined);
 
 export function DashboardProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [isDemoMode, setIsDemoMode] = useState(false);
   const [healthScore, setHealthScore] = useState(0);
 
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
+
   return (
     <DashboardContext.Provider value={{ 
+      user,
       transactions, setTransactions, 
       isDemoMode, setIsDemoMode,
       healthScore, setHealthScore
