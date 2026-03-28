@@ -14,7 +14,7 @@ import FinancialReportModal from "@/components/dashboard/FinancialReportModal";
 import { db, auth } from "@/lib/firebase";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { useRouter } from "next/navigation";
-import { ShieldCheck, Zap } from "lucide-react";
+import { ShieldCheck, Zap, RotateCcw } from "lucide-react";
 import { useDashboard } from "@/context/DashboardContext";
 
 export default function DashboardPage() {
@@ -142,6 +142,22 @@ export default function DashboardPage() {
     setIsDemoMode(true);
   };
 
+  const handleReset = () => {
+    setImportedData([]);
+    setIsDemoMode(false);
+    setTransactions([]);
+    setHealthScore(50);
+    setMetrics({
+      thisMonthIncome: 0,
+      lastMonthIncome: 0,
+      thisMonthExpense: 0,
+      lastMonthExpense: 0,
+      persona: "Balanced",
+      savingsRatio: 0,
+      streak: 7
+    });
+  };
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-12">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -161,6 +177,15 @@ export default function DashboardPage() {
         </div>
         
         <div className="flex flex-wrap items-center gap-3">
+          {(isDemoMode || transactions.length > 0) && (
+            <button
+              onClick={handleReset}
+              className="flex items-center gap-2 px-3 py-1.5 bg-rose-500/10 text-rose-400 border border-rose-500/20 rounded-xl text-xs font-bold hover:bg-rose-500/20 transition-colors"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              Reset Data
+            </button>
+          )}
           <div className="flex items-center bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 self-stretch">
             <span className="text-xs font-medium text-gray-400 mr-3">Demo Mode</span>
             <button 

@@ -64,34 +64,43 @@ export default function SummaryCards({ transactions }: SummaryCardsProps) {
 
   const balance = totalIncome - totalExpense;
 
+  const fmt = (n: number) => {
+    const abs = Math.abs(n);
+    const prefix = n < 0 ? "-₹" : "₹";
+    if (abs >= 10000000) return `${prefix}${(abs / 10000000).toFixed(2)} Cr`;
+    if (abs >= 100000) return `${prefix}${(abs / 100000).toFixed(2)} L`;
+    return `${prefix}${Math.floor(abs).toLocaleString('en-IN')}`;
+  };
+
+  const balanceChange = totalIncome > 0 ? (((balance) / totalIncome) * 100).toFixed(1) : "0";
   const cards = [
     {
       title: "Total Balance",
-      amount: `₹${balance.toLocaleString('en-IN')}`,
-      trend: "+2.4%",
-      isPositive: true,
+      amount: fmt(balance),
+      trend: `${Number(balanceChange) >= 0 ? '+' : ''}${balanceChange}%`,
+      isPositive: balance >= 0,
       icon: <Wallet className="w-6 h-6 text-indigo-400" />,
       color: "from-indigo-500 to-purple-600",
     },
     {
       title: "Incoming Assets",
-      amount: `₹${totalIncome.toLocaleString('en-IN')}`,
-      trend: "+12%",
+      amount: fmt(totalIncome),
+      trend: `+${transactions.filter(t => t.type === 'Income').length} txns`,
       isPositive: true,
       icon: <ArrowUpRight className="w-6 h-6 text-emerald-400" />,
       color: "from-emerald-400 to-teal-500",
     },
     {
       title: "Active Burn",
-      amount: `₹${totalExpense.toLocaleString('en-IN')}`,
-      trend: "-5.2%",
+      amount: fmt(totalExpense),
+      trend: `${transactions.filter(t => t.type === 'Expense').length} txns`,
       isPositive: false,
       icon: <ArrowDownRight className="w-6 h-6 text-rose-400" />,
       color: "from-rose-500 to-red-600",
     },
     {
       title: "Projected 30d",
-      amount: `₹${(totalIncome * 1.15).toLocaleString('en-IN')}`,
+      amount: fmt(Math.max(0, balance * 1.15)),
       trend: "+15.8%",
       isPositive: true,
       icon: <Target className="w-6 h-6 text-amber-400" />,
