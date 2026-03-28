@@ -28,6 +28,7 @@ interface TaxResult {
 export default function TaxWizard() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<TaxResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
   
   const [formData, setFormData] = useState({
     salaryStructure: {
@@ -70,14 +71,16 @@ export default function TaxWizard() {
   const calculateTax = async () => {
     setLoading(true);
     setResult(null); // Clear previous result
+    setError(null);
     try {
       const data = await fetchAPI("/api/tax-wizard", {
         method: "POST",
         body: JSON.stringify(formData),
       });
       setResult(data);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Tax calculation error:", error);
+      setError(error.message || "Failed to calculate tax. Please check your inputs.");
     } finally {
       setLoading(false);
     }
@@ -161,8 +164,17 @@ export default function TaxWizard() {
           </motion.div>
         </div>
 
-        {/* Results Column */}
         <div className="lg:col-span-12 xl:col-span-7 space-y-6">
+           {error && (
+             <motion.div 
+               initial={{ opacity: 0, y: -10 }}
+               animate={{ opacity: 1, y: 0 }}
+               className="p-6 rounded-3xl bg-rose-500/10 border border-rose-500/20 flex items-center gap-4 text-rose-400"
+             >
+                <ShieldAlert className="w-6 h-6 shrink-0" />
+                <p className="text-xs font-bold uppercase tracking-widest leading-relaxed">{error}</p>
+             </motion.div>
+           )}
            <AnimatePresence mode="wait">
             {!result ? (
               <motion.div 

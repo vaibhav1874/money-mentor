@@ -9,6 +9,7 @@ import { fetchAPI } from "@/lib/api";
 export default function SmartInsights() {
   const [insights, setInsights] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -46,8 +47,10 @@ export default function SmartInsights() {
            body: JSON.stringify({ transactions: txs })
         });
         setInsights(json);
-      } catch (error) {
+        setError(null);
+      } catch (error: any) {
         console.error("Failed to generate AI insights", error);
+        setError(error.message || "Failed to generate personal insights. Please try again later.");
       } finally {
         setLoading(false);
       }
@@ -84,7 +87,14 @@ export default function SmartInsights() {
         </h1>
         <p className="text-gray-400 mt-1">AI-driven analysis of your recent spending habits.</p>
       </div>
-
+      
+      {error && (
+        <div className="p-10 text-center glass-card rounded-[2rem] border-rose-500/20 bg-rose-500/5">
+           <h3 className="text-rose-400 font-bold mb-2 uppercase tracking-widest">Analysis Paused</h3>
+           <p className="text-gray-500 text-sm italic">{error}</p>
+        </div>
+      )}
+      
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
         {insights.map((insight: any) => (
           <div key={insight.id} className={`bg-gradient-to-br from-${insight.color}-900/10 to-black border border-${insight.color}-500/20 rounded-2xl p-6 relative overflow-hidden flex flex-col hover:bg-white/5 transition-colors`}>

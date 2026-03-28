@@ -31,6 +31,7 @@ interface CouplePlan {
 export default function CouplePlanner() {
   const [loading, setLoading] = useState(false);
   const [plan, setPlan] = useState<CouplePlan | null>(null);
+  const [error, setError] = useState<string | null>(null);
   
   const [formData, setFormData] = useState({
     partner1: { name: "Partner 1", income: 120000, rent: 40000, nps: 0 },
@@ -57,14 +58,16 @@ export default function CouplePlanner() {
   const optimizeFinances = async () => {
     setLoading(true);
     setPlan(null); // Clear previous plan
+    setError(null);
     try {
       const data = await fetchAPI("/api/couple-planner", {
         method: "POST",
         body: JSON.stringify(formData),
       });
       setPlan(data);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Couple Planner Error:", error);
+      setError(error.message || "Something went wrong. Please check your inputs.");
     } finally {
       setLoading(false);
     }
@@ -231,6 +234,16 @@ export default function CouplePlanner() {
 
         {/* Results Column */}
         <div className="space-y-6 min-h-[600px]">
+           {error && (
+             <motion.div 
+               initial={{ opacity: 0, y: -10 }}
+               animate={{ opacity: 1, y: 0 }}
+               className="p-6 rounded-[2rem] bg-rose-500/10 border border-rose-500/20 flex items-center gap-4 text-rose-400"
+             >
+                <ShieldCheck className="w-6 h-6 shrink-0" />
+                <p className="text-xs font-bold uppercase tracking-widest">{error}</p>
+             </motion.div>
+           )}
            <AnimatePresence mode="wait">
             {!plan ? (
               <motion.div 

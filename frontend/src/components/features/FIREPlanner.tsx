@@ -22,7 +22,8 @@ import {
   Loader2,
   AlertCircle,
   ChevronRight,
-  Zap
+  Zap,
+  ShieldAlert
 } from "lucide-react";
 
 interface FIREPlan {
@@ -44,6 +45,7 @@ interface FIREPlan {
 export default function FIREPlanner() {
   const [loading, setLoading] = useState(false);
   const [plan, setPlan] = useState<FIREPlan | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [chartData, setChartData] = useState<any[]>([]);
   const [formData, setFormData] = useState({
     age: 28,
@@ -86,14 +88,16 @@ export default function FIREPlanner() {
   const generatePlan = async () => {
     setLoading(true);
     setPlan(null); // Clear previous plan to show new loading state
+    setError(null);
     try {
       const data = await fetchAPI("/api/fire-planner", {
         method: "POST",
         body: JSON.stringify(formData),
       });
       setPlan(data);
-    } catch (error) {
+    } catch (error: any) {
       console.error("FIRE calculation error:", error);
+      setError(error.message || "Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -195,9 +199,19 @@ export default function FIREPlanner() {
           </motion.div>
         </div>
 
-        {/* Results Section */}
-        <div className="lg:col-span-8 flex flex-col gap-6">
-          <AnimatePresence mode="wait">
+        {/* Outcome Column */}
+        <div className="lg:col-span-8 space-y-6">
+           {error && (
+             <motion.div 
+               initial={{ opacity: 0, scale: 0.95 }}
+               animate={{ opacity: 1, scale: 1 }}
+               className="p-6 rounded-[2rem] bg-rose-500/10 border border-rose-500/20 flex items-center gap-4 text-rose-400"
+             >
+                <ShieldAlert className="w-6 h-6 shrink-0" />
+                <p className="text-sm font-bold uppercase tracking-widest">{error}</p>
+             </motion.div>
+           )}
+           <AnimatePresence mode="wait">
             {!plan ? (
               <motion.div 
                 key="empty"

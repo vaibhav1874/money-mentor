@@ -31,6 +31,7 @@ export default function LifeEventAdvisor() {
   const [amount, setAmount] = useState(500000);
   const [details, setDetails] = useState("");
   const [result, setResult] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const renderText = (val: any) => {
     if (!val) return "";
@@ -44,14 +45,20 @@ export default function LifeEventAdvisor() {
   const getAdvice = async () => {
     setLoading(true);
     setResult(null); // Clear previous result
+    setError(null);
     try {
       const data = await fetchAPI("/api/life-event-advisor", {
         method: "POST",
-        body: JSON.stringify({ event: selectedEvent, amount: Number(amount) || 0, details }),
+        body: JSON.stringify({ 
+          event: selectedEvent.id, // Fixed: send ID string instead of object
+          amount: Number(amount) || 0, 
+          details 
+        }),
       });
       setResult(data);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Advisor Error:", error);
+      setError(error.message || "Failed to generate advice. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -130,7 +137,17 @@ export default function LifeEventAdvisor() {
         </div>
 
         {/* Results Card */}
-        <div className="lg:col-span-7 h-full">
+        <div className="lg:col-span-7 h-full space-y-6">
+           {error && (
+             <motion.div 
+               initial={{ opacity: 0, y: -10 }}
+               animate={{ opacity: 1, y: 0 }}
+               className="p-6 rounded-[2rem] bg-rose-500/10 border border-rose-500/20 flex items-center gap-4 text-rose-400"
+             >
+                <ShieldCheck className="w-6 h-6 shrink-0" />
+                <p className="text-xs font-bold uppercase tracking-widest leading-relaxed">{error}</p>
+             </motion.div>
+           )}
            <AnimatePresence mode="wait">
             {!result ? (
                <motion.div 

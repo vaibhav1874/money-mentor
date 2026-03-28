@@ -39,6 +39,7 @@ const COLORS = ['#06b6d4', '#3b82f6', '#8b5cf6', '#ec4899', '#f97316'];
 export default function MFXRay() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<XRayResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [rawText, setRawText] = useState("");
   
   const [holdings, setHoldings] = useState([
@@ -59,14 +60,16 @@ export default function MFXRay() {
   const analyzePortfolio = async () => {
     setLoading(true);
     setResult(null); // Clear previous result
+    setError(null);
     try {
       const data = await fetchAPI("/api/mf-xray", {
         method: "POST",
         body: JSON.stringify({ holdings }),
       });
       setResult(data);
-    } catch (error) {
+    } catch (error: any) {
       console.error("MF X-ray Error:", error);
+      setError(error.message || "Failed to analyze portfolio. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -163,9 +166,18 @@ export default function MFXRay() {
           </motion.div>
         </div>
 
-        {/* Results Section */}
         <div className="lg:col-span-7 flex flex-col gap-6">
-          <AnimatePresence mode="wait">
+           {error && (
+             <motion.div 
+               initial={{ opacity: 0, y: -10 }}
+               animate={{ opacity: 1, y: 0 }}
+               className="p-6 rounded-[2rem] bg-rose-500/10 border border-rose-500/20 flex items-center gap-4 text-rose-400"
+             >
+                <ShieldAlert className="w-6 h-6 shrink-0" />
+                <p className="text-xs font-bold uppercase tracking-widest leading-relaxed">{error}</p>
+             </motion.div>
+           )}
+           <AnimatePresence mode="wait">
             {!result ? (
               <motion.div 
                 key="empty"

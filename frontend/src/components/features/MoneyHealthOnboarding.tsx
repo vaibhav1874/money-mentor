@@ -80,6 +80,7 @@ export default function MoneyHealthOnboarding() {
   const [currentStep, setCurrentStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
   const [responses, setResponses] = useState<any>({
     emergencyFundMonths: 3,
     insuranceCoverage: true,
@@ -104,14 +105,18 @@ export default function MoneyHealthOnboarding() {
   const calculateScore = async () => {
     setLoading(true);
     setResult(null); // Clear previous result
+    setError(null);
     try {
       const data = await fetchAPI("/api/money-health-score", {
         method: "POST",
         body: JSON.stringify(responses),
       });
       setResult(data);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Health calculation error:", error);
+      setError(error.message || "Failed to calculate health score. Please try again.");
+      // If error occurs, reset current step so user can try again
+      setCurrentStep(steps.length - 1);
     } finally {
       setLoading(false);
     }
@@ -293,19 +298,29 @@ export default function MoneyHealthOnboarding() {
 
             <div className="w-full flex gap-3">
               <button 
-                onClick={handleBack} disabled={currentStep === 0}
+                onClick={handleBack} disabled={currentStep === 0 || loading}
                 className="flex-1 py-4 bg-white/5 rounded-2xl text-gray-400 font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2 hover:bg-white/10 transition-all disabled:opacity-30"
               >
                 <ChevronLeft className="w-4 h-4" /> Back
               </button>
               <button 
-                onClick={handleNext}
+                onClick={handleNext} disabled={loading}
                 className="flex-[2] py-4 premium-gradient-primary rounded-2xl text-white font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2 shadow-lg shadow-primary-500/20 hover:opacity-90 transition-all"
               >
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : currentStep === steps.length - 1 ? "Get My Score" : "Continue"}
                 {!loading && <ChevronRight className="w-4 h-4" />}
               </button>
             </div>
+            
+            {error && (
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-6 p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-center"
+              >
+                <p className="text-[10px] font-black uppercase tracking-widest">{error}</p>
+              </motion.div>
+            )}
           </div>
         </motion.div>
       </AnimatePresence>

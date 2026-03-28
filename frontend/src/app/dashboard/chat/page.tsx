@@ -64,13 +64,13 @@ export default function ChatPage() {
           time: data.time || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         }
       ]);
-    } catch (error) {
+    } catch (error: any) {
       setMessages(prev => [
         ...prev,
         {
           id: Date.now() + 1,
           sender: "ai",
-          text: "I'm having trouble connecting to the neural core. Please verify the backend server is operational on port 8000.",
+          text: error.message || "I'm having trouble connecting to my neural core. Please try again in a few seconds.",
           time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         }
       ]);

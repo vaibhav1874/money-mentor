@@ -20,6 +20,12 @@ export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
     clearTimeout(timeoutId);
 
     if (!response.ok) {
+      if (response.status === 429) {
+        throw new Error("AI is currently busy (Rate Limit reached). Please wait 30 seconds and try again.");
+      }
+      if (response.status === 502 || response.status === 503) {
+        throw new Error("The backend is waking up or overloaded. Please wait a moment and try again.");
+      }
       const error = await response.json().catch(() => ({}));
       throw new Error(error.message || `API Error: ${response.status}`);
     }
