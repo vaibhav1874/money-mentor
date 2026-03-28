@@ -27,8 +27,8 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip("\"'")
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
     # Trying the least-cost model to bypass free-tier Quota limits
-    # Using gemini-1.5-flash as the stable free-tier model
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    # Using gemini-2.5-flash (confirmed available for this API key)
+    model = genai.GenerativeModel('gemini-2.5-flash')
 else:
     model = None
 
