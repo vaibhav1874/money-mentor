@@ -189,14 +189,22 @@ export default function FIREPlanner() {
 
               <div className="space-y-2">
                 <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Risk Profile</label>
-                <select 
-                  name="riskProfile" value={formData.riskProfile} onChange={handleInputChange}
-                  className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange-500/50 transition-colors font-bold appearance-none"
-                >
-                  <option value="conservative">Conservative</option>
-                  <option value="moderate">Moderate</option>
-                  <option value="aggressive">Aggressive</option>
-                </select>
+                <div className="flex rounded-xl overflow-hidden border border-white/10">
+                  {["conservative", "moderate", "aggressive"].map(opt => (
+                    <button
+                      key={opt}
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, riskProfile: opt }))}
+                      className={`flex-1 py-3 text-xs font-black uppercase tracking-wider transition-all ${
+                        formData.riskProfile === opt
+                          ? "bg-orange-500/30 text-orange-400 border-orange-500/50"
+                          : "bg-white/[0.03] text-gray-500 hover:bg-white/10 hover:text-gray-300"
+                      }`}
+                    >
+                      {opt.charAt(0).toUpperCase() + opt.slice(1)}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               <button 
