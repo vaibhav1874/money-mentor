@@ -10,6 +10,10 @@ load_dotenv()
 
 app = FastAPI()
 
+@app.get("/api/health")
+def health_check():
+    return {"status": "ok", "version": "1.0.2", "timestamp": "2026-03-28T13:55:00"}
+
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
