@@ -69,15 +69,11 @@ export default function TaxWizard() {
 
   const calculateTax = async () => {
     setLoading(true);
-    const controller = new AbortController();
-    const id = setTimeout(() => controller.abort(), 20000);
     try {
       const data = await fetchAPI("/api/tax-wizard", {
         method: "POST",
         body: JSON.stringify(formData),
-        signal: controller.signal
       });
-      clearTimeout(id);
       setResult(data);
     } catch (error) {
       console.error("Tax calculation error:", error);

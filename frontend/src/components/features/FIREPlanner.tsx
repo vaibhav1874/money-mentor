@@ -84,15 +84,12 @@ export default function FIREPlanner() {
   };
 
   const generatePlan = async () => {
-    const controller = new AbortController();
-    const id = setTimeout(() => controller.abort(), 20000);
+    setLoading(true);
     try {
       const data = await fetchAPI("/api/fire-planner", {
         method: "POST",
         body: JSON.stringify(formData),
-        signal: controller.signal
       });
-      clearTimeout(id);
       setPlan(data);
     } catch (error) {
       console.error("FIRE calculation error:", error);

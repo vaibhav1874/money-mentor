@@ -56,15 +56,11 @@ export default function CouplePlanner() {
 
   const optimizeFinances = async () => {
     setLoading(true);
-    const controller = new AbortController();
-    const id = setTimeout(() => controller.abort(), 20000);
     try {
       const data = await fetchAPI("/api/couple-planner", {
         method: "POST",
         body: JSON.stringify(formData),
-        signal: controller.signal
       });
-      clearTimeout(id);
       setPlan(data);
     } catch (error) {
       console.error("Couple Planner Error:", error);

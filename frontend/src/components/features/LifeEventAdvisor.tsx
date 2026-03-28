@@ -43,15 +43,11 @@ export default function LifeEventAdvisor() {
 
   const getAdvice = async () => {
     setLoading(true);
-    const controller = new AbortController();
-    const id = setTimeout(() => controller.abort(), 20000);
     try {
       const data = await fetchAPI("/api/life-event-advisor", {
         method: "POST",
         body: JSON.stringify({ event: selectedEvent, amount: Number(amount) || 0, details }),
-        signal: controller.signal
       });
-      clearTimeout(id);
       setResult(data);
     } catch (error) {
       console.error("Advisor Error:", error);

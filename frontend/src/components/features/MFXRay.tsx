@@ -58,15 +58,11 @@ export default function MFXRay() {
 
   const analyzePortfolio = async () => {
     setLoading(true);
-    const controller = new AbortController();
-    const id = setTimeout(() => controller.abort(), 20000);
     try {
       const data = await fetchAPI("/api/mf-xray", {
         method: "POST",
         body: JSON.stringify({ holdings }),
-        signal: controller.signal
       });
-      clearTimeout(id);
       setResult(data);
     } catch (error) {
       console.error("MF X-ray Error:", error);
