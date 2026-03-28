@@ -19,9 +19,16 @@ interface IntelligenceProps {
 }
 
 export default function AdvancedIntelligence({ savingsRate, monthlyIncome, monthlyExpense }: IntelligenceProps) {
-  const monthlySavings = monthlyIncome - monthlyExpense;
+  const monthlySavings = Math.max(0, monthlyIncome - monthlyExpense);
   const sixMonthSavings = monthlySavings * 6;
   const yearlySavings = monthlySavings * 12;
+  const noData = monthlyIncome === 0 && monthlyExpense === 0;
+
+  const formatAmount = (n: number) => {
+    if (n >= 10000000) return `₹${(n / 10000000).toFixed(1)} Cr`;
+    if (n >= 100000) return `₹${(n / 100000).toFixed(1)} L`;
+    return `₹${Math.floor(n).toLocaleString('en-IN')}`;
+  };
 
   const recommendations = [
     {
@@ -68,21 +75,30 @@ export default function AdvancedIntelligence({ savingsRate, monthlyIncome, month
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-5 rounded-2xl bg-black/40 border border-white/5 group/card hover:border-blue-500/30 transition-all">
-               <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">6-Month Outlook</p>
-               <h4 className="text-2xl font-black text-white mb-2">₹{sixMonthSavings.toLocaleString('en-IN')}</h4>
-               <p className="text-[11px] text-green-400 font-bold flex items-center gap-1">
-                 <ArrowUpRight className="w-3 h-3" />
-                 Potential Growth
-               </p>
-            </div>
-            <div className="p-5 rounded-2xl bg-gradient-to-br from-blue-600/10 to-purple-600/10 border border-blue-500/20 group/card hover:border-blue-500/40 transition-all">
-               <p className="text-xs font-bold text-blue-300 uppercase tracking-widest mb-1">1-Year Target</p>
-               <h4 className="text-2xl font-black text-white mb-2">₹{yearlySavings.toLocaleString('en-IN')}</h4>
-               <p className="text-[11px] text-blue-100 font-medium leading-relaxed">
-                 {yearlySavings > 100000 ? "You're on track to a major milestone! 🚀" : "Consistent saving will build wealth."}
-               </p>
-            </div>
+            {noData ? (
+              <div className="md:col-span-2 flex flex-col items-center justify-center h-28 rounded-2xl bg-black/40 border border-dashed border-white/10 text-gray-500 space-y-1">
+                <p className="italic text-sm">No transaction data yet.</p>
+                <p className="text-xs">Add or import transactions to see your forecast.</p>
+              </div>
+            ) : (
+              <>
+                <div className="p-5 rounded-2xl bg-black/40 border border-white/5 group/card hover:border-blue-500/30 transition-all min-w-0">
+                   <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">6-Month Outlook</p>
+                   <h4 className="text-2xl font-black text-white mb-2 truncate">{formatAmount(sixMonthSavings)}</h4>
+                   <p className="text-[11px] text-green-400 font-bold flex items-center gap-1">
+                     <ArrowUpRight className="w-3 h-3 shrink-0" />
+                     Potential Growth
+                   </p>
+                </div>
+                <div className="p-5 rounded-2xl bg-gradient-to-br from-blue-600/10 to-purple-600/10 border border-blue-500/20 group/card hover:border-blue-500/40 transition-all min-w-0">
+                   <p className="text-xs font-bold text-blue-300 uppercase tracking-widest mb-1">1-Year Target</p>
+                   <h4 className="text-2xl font-black text-white mb-2 truncate">{formatAmount(yearlySavings)}</h4>
+                   <p className="text-[11px] text-blue-100 font-medium leading-relaxed">
+                     {yearlySavings > 100000 ? "You're on track to a major milestone! 🚀" : "Consistent saving will build wealth."}
+                   </p>
+                </div>
+              </>
+            )}
           </div>
         </motion.div>
 
