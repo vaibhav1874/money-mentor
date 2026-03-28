@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { fetchAPI } from "@/lib/api";
 import { 
@@ -30,6 +30,12 @@ export default function LifeEventAdvisor() {
   const [selectedEvent, setSelectedEvent] = useState(events[0]);
   const [amount, setAmount] = useState(500000);
   const [details, setDetails] = useState("");
+
+  const stateRef = useRef({ selectedEvent, amount, details });
+  useEffect(() => {
+    stateRef.current = { selectedEvent, amount, details };
+    console.log("ADVISOR: Updated state:", stateRef.current);
+  }, [selectedEvent, amount, details]);
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -43,18 +49,23 @@ export default function LifeEventAdvisor() {
   };
 
   const getAdvice = async () => {
+    const { selectedEvent: currentEvent, amount: currentAmount, details: currentDetails } = stateRef.current;
+    console.log("ADVISOR: Get Advice Clicked. Current Ref State:", stateRef.current);
     setLoading(true);
     setResult(null); // Clear previous result
     setError(null);
     try {
+      const payload = { 
+        event: currentEvent.id, 
+        amount: Number(currentAmount) || 0, 
+        details: currentDetails 
+      };
+      console.log("ADVISOR: Sending Payload:", payload);
       const data = await fetchAPI("/api/life-event-advisor", {
         method: "POST",
-        body: JSON.stringify({ 
-          event: selectedEvent.id, // Fixed: send ID string instead of object
-          amount: Number(amount) || 0, 
-          details 
-        }),
+        body: JSON.stringify(payload),
       });
+      console.log("ADVISOR: Received Response:", data);
       setResult(data);
     } catch (error: any) {
       console.error("Advisor Error:", error);

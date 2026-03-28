@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { fetchAPI } from "@/lib/api";
 import { 
@@ -45,6 +45,12 @@ export default function TaxWizard() {
     }
   });
 
+  const formDataRef = useRef(formData);
+  useEffect(() => {
+    formDataRef.current = formData;
+    console.log("TAX: Updated formData:", formData);
+  }, [formData]);
+
   const handleSalaryChange = (key: string, value: string) => {
     setFormData({
       ...formData,
@@ -69,14 +75,18 @@ export default function TaxWizard() {
   };
 
   const calculateTax = async () => {
+    console.log("TAX: Calculate Clicked. Current Ref State:", formDataRef.current);
     setLoading(true);
     setResult(null); // Clear previous result
     setError(null);
     try {
+      const payload = formDataRef.current;
+      console.log("TAX: Sending Payload:", payload);
       const data = await fetchAPI("/api/tax-wizard", {
         method: "POST",
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
+      console.log("TAX: Received Response:", data);
       setResult(data);
     } catch (error: any) {
       console.error("Tax calculation error:", error);

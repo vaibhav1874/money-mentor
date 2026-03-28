@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { fetchAPI } from "@/lib/api";
 import { 
@@ -56,6 +56,13 @@ export default function FIREPlanner() {
     riskProfile: "moderate"
   });
 
+  // Use a ref to always have the latest data for the API call (avoids stale closures)
+  const formDataRef = useRef(formData);
+  useEffect(() => {
+    formDataRef.current = formData;
+    console.log("FIRE: Updated formData in state & ref:", formData);
+  }, [formData]);
+
   useEffect(() => {
     if (plan) {
       // Regenerate chart data when a new plan is received to show dynamism
@@ -86,14 +93,18 @@ export default function FIREPlanner() {
   };
 
   const generatePlan = async () => {
+    console.log("FIRE: Generate Plan Clicked. Current Ref State:", formDataRef.current);
     setLoading(true);
     setPlan(null); // Clear previous plan to show new loading state
     setError(null);
     try {
+      const payload = formDataRef.current;
+      console.log("FIRE: Sending Payload to API:", payload);
       const data = await fetchAPI("/api/fire-planner", {
         method: "POST",
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
+      console.log("FIRE: Received Response:", data);
       setPlan(data);
     } catch (error: any) {
       console.error("FIRE calculation error:", error);

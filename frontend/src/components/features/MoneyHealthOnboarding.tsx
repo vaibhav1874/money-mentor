@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { fetchAPI } from "@/lib/api";
 import { 
@@ -84,11 +84,17 @@ export default function MoneyHealthOnboarding() {
   const [responses, setResponses] = useState<any>({
     emergencyFundMonths: 3,
     insuranceCoverage: true,
-    isDebtFree: true,
+    isDebtFree: false,
     isInvesting: true,
     taxEfficiencyScore: 7,
     retirementPlanned: false
   });
+
+  const responsesRef = useRef(responses);
+  useEffect(() => {
+    responsesRef.current = responses;
+    console.log("HEALTH: Updated responses:", responses);
+  }, [responses]);
 
   const handleNext = () => {
     if (currentStep < steps.length - 1) {
@@ -103,14 +109,18 @@ export default function MoneyHealthOnboarding() {
   };
 
   const calculateScore = async () => {
+    console.log("HEALTH: Calculate Clicked. Current Ref State:", responsesRef.current);
     setLoading(true);
     setResult(null); // Clear previous result
     setError(null);
     try {
+      const payload = responsesRef.current;
+      console.log("HEALTH: Sending Payload:", payload);
       const data = await fetchAPI("/api/money-health-score", {
         method: "POST",
-        body: JSON.stringify(responses),
+        body: JSON.stringify(payload),
       });
+      console.log("HEALTH: Received Response:", data);
       setResult(data);
     } catch (error: any) {
       console.error("Health calculation error:", error);

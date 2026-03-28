@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { fetchAPI } from "@/lib/api";
 import { 
@@ -48,6 +48,12 @@ export default function MFXRay() {
     { scheme: "ICICI Prudential Bluechip", amount: 200000, category: "Equity" }
   ]);
 
+  const holdingsRef = useRef(holdings);
+  useEffect(() => {
+    holdingsRef.current = holdings;
+    console.log("MFX: Updated holdings:", holdings);
+  }, [holdings]);
+
   const renderText = (val: any) => {
     if (!val) return "";
     if (typeof val === 'string') return val;
@@ -58,14 +64,18 @@ export default function MFXRay() {
   };
 
   const analyzePortfolio = async () => {
+    console.log("MFX: Analyze Clicked. Current Ref State:", holdingsRef.current);
     setLoading(true);
     setResult(null); // Clear previous result
     setError(null);
     try {
+      const payload = { holdings: holdingsRef.current };
+      console.log("MFX: Sending Payload:", payload);
       const data = await fetchAPI("/api/mf-xray", {
         method: "POST",
-        body: JSON.stringify({ holdings }),
+        body: JSON.stringify(payload),
       });
+      console.log("MFX: Received Response:", data);
       setResult(data);
     } catch (error: any) {
       console.error("MF X-ray Error:", error);

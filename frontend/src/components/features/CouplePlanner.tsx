@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { fetchAPI } from "@/lib/api";
 import { 
@@ -39,6 +39,12 @@ export default function CouplePlanner() {
     goals: ["Buy a Home", "Child Education", "Retirement"]
   });
 
+  const formDataRef = useRef(formData);
+  useEffect(() => {
+    formDataRef.current = formData;
+    console.log("COUPLE: Updated formData:", formData);
+  }, [formData]);
+
   const handlePartnerChange = (partner: 'partner1' | 'partner2', key: string, value: any) => {
     setFormData({
       ...formData,
@@ -56,14 +62,18 @@ export default function CouplePlanner() {
   };
 
   const optimizeFinances = async () => {
+    console.log("COUPLE: Optimize Clicked. Current Ref State:", formDataRef.current);
     setLoading(true);
     setPlan(null); // Clear previous plan
     setError(null);
     try {
+      const payload = formDataRef.current;
+      console.log("COUPLE: Sending Payload:", payload);
       const data = await fetchAPI("/api/couple-planner", {
         method: "POST",
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
+      console.log("COUPLE: Received Response:", data);
       setPlan(data);
     } catch (error: any) {
       console.error("Couple Planner Error:", error);
