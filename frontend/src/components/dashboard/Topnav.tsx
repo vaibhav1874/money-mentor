@@ -11,20 +11,6 @@ export default function Topnav() {
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Derive initials from user displayName or email
-  const getInitials = () => {
-    if (user?.displayName) {
-      const names = user.displayName.split(' ');
-      if (names.length >= 2) {
-        return `${names[0][0]}${names[1][0]}`.toUpperCase();
-      }
-      return names[0].substring(0, 2).toUpperCase();
-    }
-    if (user?.email) {
-      return user.email.substring(0, 2).toUpperCase();
-    }
-    return "JD";
-  };
 
   // Simple alert logic
   const alerts = [];
@@ -151,12 +137,6 @@ export default function Topnav() {
             )}
           </AnimatePresence>
         </div>
-
-        <Link href="/dashboard/profile">
-          <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs shadow-md cursor-pointer border border-white/10 hover:scale-110 transition-transform">
-            {getInitials()}
-          </div>
-        </Link>
       </div>
     </header>
   );
