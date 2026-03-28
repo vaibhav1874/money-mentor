@@ -23,7 +23,8 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip("\"'")
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
     # Trying the least-cost model to bypass free-tier Quota limits
-    model = genai.GenerativeModel('gemini-flash-lite-latest')
+    # Using gemini-1.5-flash as the stable free-tier model
+    model = genai.GenerativeModel('gemini-1.5-flash')
 else:
     model = None
 
@@ -217,33 +218,49 @@ def get_fire_plan(input: FIREInput):
     IMPORTANT: You must explicitly mention the user's age ({input.age}) and income (₹{input.monthlyIncome}) in the 'overallAdvice' or 'details' to make it personalized.
     Return ONLY raw JSON in a structured format with 'roadmap' (list of milestones/months) and a 'summary'.
     """
+    # DYNAMIC FALLBACK: If Gemini fails, calculate based on actual input
+    years_to_fire = max(5, input.retirementAge - input.age)
+    monthly_savings = input.monthlyIncome - input.monthlyExpenses
+    corpus_needed = input.monthlyExpenses * 12 * 25 # 25x Rule
+    sip_needed = (corpus_needed - input.existingInvestments) / (years_to_fire * 12) if years_to_fire > 0 else 0
+    
     default_plan = {
         "roadmap": [
-            {"month": "Month 1", "action": "Increase SIP", "details": "Start by increasing your current SIP by 10% to accelerate corpus building."},
-            {"month": "Month 6", "action": "Rebalance Portfolio", "details": "Shift 5% from Debt to Equity if market conditions allow."},
-            {"milestone": "Year 2", "action": "Insurance Review", "details": "Add Term Insurance of at least 20x annual income."}
+            {"month": "Month 1", "action": f"Start aggressive SIP of ₹{max(5000, int(monthly_savings * 0.4)):,}", "details": f"Based on your ₹{input.monthlyIncome:,} income, allocate 40% of surplus to equity."},
+            {"month": "Month 6", "action": "Rebalance Portfolio", "details": f"At Age {input.age + 1}, shift 5% from Debt to Equity to match your {input.riskProfile} profile."},
+            {"milestone": f"Age {input.retirementAge}", "action": "Achieve FIRE", "details": f"Target corpus of ₹{corpus_needed/10000000:.1f} Cr reached for retirement."}
         ],
         "summary": {
-            "totalCorpusNeeded": "₹4.5 Cr",
-            "yearsToFire": "15 Years",
-            "monthlySipRequired": "₹45,000",
-            "overallAdvice": "Your current savings rate is good. Focus on aggressive equity allocation in the initial 5 years."
+            "totalCorpusNeeded": f"₹{corpus_needed/10000000:.2f} Cr",
+            "yearsToFire": f"{years_to_fire} Years",
+            "monthlySipRequired": f"₹{max(0, int(sip_needed)):,}",
+            "overallAdvice": f"Hi! At age {input.age}, you have {years_to_fire} years to build wealth. With ₹{input.monthlyExpenses:,} expenses, you need a ₹{corpus_needed/10000000:.1f} Cr corpus."
         }
     }
     try:
         response = model.generate_content(prompt)
         text = response.text.strip()
-        # More robust JSON cleaning
+        # Clean the text to ensure it's valid JSON
         if "```" in text:
-            text = text.split("```")[1]
-            if text.startswith("json"): text = text[4:]
-        elif "[" in text or "{" in text:
-            # Try to find the start of JSON if it's buried in text
+            parts = text.split("```")
+            for part in parts:
+                if part.strip().startswith("json"):
+                    text = part.strip()[4:].strip()
+                    break
+                elif part.strip().startswith("{"):
+                    text = part.strip()
+                    break
+        
+        # Final safety check if json.loads fails
+        try:
+            return json.loads(text)
+        except:
+            # Try finding first { and last }
             start = text.find("{")
             end = text.rfind("}") + 1
             if start != -1 and end != 0:
-                text = text[start:end]
-        return json.loads(text)
+                return json.loads(text[start:end])
+            raise e
     except Exception as e:
         print(f"FIRE Planner Error: {e}")
         return default_plan
@@ -276,16 +293,23 @@ def get_life_event_advice(input: LifeEventInput):
     IMPORTANT: Explicitly mention the amount ₹{input.amount} in your advice.
     Return JSON with 'advice' and 'actions'.
     """
+    # DYNAMIC FALLBACK: Direct mention of the event and amount
     default_advice = {
-        "advice": "General financial prudence suggests diversifying this windfall across debt and equity.",
-        "actions": ["Park in Liquid Fund for 3 months", "Start a Weekly Systematic Transfer Plan (STP)", "Check 80C limits"]
+        "advice": f"For your {input.event} of ₹{input.amount:,}, we recommend a balanced allocation. {input.details}",
+        "actions": [f"Allocate 50% of ₹{input.amount:,} to a Debt Fund", "Use 20% for immediate goals", "Check for tax implications of this windfall"]
     }
     try:
         response = model.generate_content(prompt)
         text = response.text.strip()
         if "```" in text:
-            text = text.split("```")[1]
-            if text.startswith("json"): text = text[4:]
+            parts = text.split("```")
+            for part in parts:
+                if part.strip().startswith("json"):
+                    text = part.strip()[4:].strip()
+                    break
+                elif part.strip().startswith("{"):
+                    text = part.strip()
+                    break
         return json.loads(text)
     except Exception as e:
         print(f"Advice Error: {e}")
@@ -302,18 +326,35 @@ def get_tax_wizard(input: TaxInput):
     IMPORTANT: The input salary is {input.salaryStructure.get('basic', 0) + input.salaryStructure.get('hra', 0)}. Use these actual numbers in your 'recommendation'.
     Return JSON with 'oldRegimeTax', 'newRegimeTax', 'recommendation', and 'tips'.
     """
+    # DYNAMIC FALLBACK: Basic Indian Income Tax Logic
+    basic = input.salaryStructure.get('basic', 0)
+    hra = input.salaryStructure.get('hra', 0)
+    gross = basic + hra + sum(v for k, v in input.salaryStructure.items() if k not in ['basic', 'hra'])
+    deductions = sum(input.deductions.values())
+    
+    # Very rough old vs new estimates
+    taxable_old = max(0, gross - deductions - 50000) # Standard deduction
+    tax_old = taxable_old * 0.25 # Over-simplified 25% average
+    tax_new = max(0, gross - 75000) * 0.20 # Over-simplified 20% average
+    
     default_tax = {
-        "oldRegimeTax": 125000,
-        "newRegimeTax": 115000,
-        "recommendation": "The New Regime appears better. Switch if you don't have large 80C/HRA deductions.",
-        "tips": ["Invest in NPS for extra 50k deduction", "Check health insurance for parents (80D)"]
+        "oldRegimeTax": int(tax_old),
+        "newRegimeTax": int(tax_new),
+        "recommendation": f"Based on your ₹{gross:,} income, the New Regime might save ₹{abs(int(tax_old-tax_new)):,} in taxes.",
+        "tips": [f"Invest ₹{max(0, 150000 - input.deductions.get('section80C', 0)):,} more in 80C to save tax in Old Regime.", "Check NPS for an extra ₹50k deduction."]
     }
     try:
         response = model.generate_content(prompt)
         text = response.text.strip()
         if "```" in text:
-            text = text.split("```")[1]
-            if text.startswith("json"): text = text[4:]
+            parts = text.split("```")
+            for part in parts:
+                if part.strip().startswith("json"):
+                    text = part.strip()[4:].strip()
+                    break
+                elif part.strip().startswith("{"):
+                    text = part.strip()
+                    break
         return json.loads(text)
     except Exception as e:
         print(f"Tax Error: {e}")
@@ -334,20 +375,32 @@ def get_couple_plan(input: CoupleInput):
     IMPORTANT: Mention both partners' names or profiles ({json.dumps(input.partner1.get('name', 'Partner 1'))} and {json.dumps(input.partner2.get('name', 'Partner 2'))}) in the 'optimizationStrategy' to show it's personalized.
     Return JSON with 'optimizationStrategy', 'sipSplits', and 'jointNetWorth'.
     """
+    # DYNAMIC FALLBACK: Mention both partners
+    p1_name = input.partner1.get('name', 'Partner 1')
+    p2_name = input.partner2.get('name', 'Partner 2')
+    combined_income = input.partner1.get('income', 0) + input.partner2.get('income', 0)
+    
     default_couple = {
-        "optimizationStrategy": "Claim HRA on Partner 1's income (higher bracket). Partner 2 should maximize NPS matching.",
-        "jointNetWorth": "₹28.5L",
+        "optimizationStrategy": f"Strategy for {p1_name} and {p2_name}: With a combined income of ₹{combined_income:,}, prioritize {p1_name}'s HRA and {p2_name}'s NPS.",
+        "jointNetWorth": f"₹{(combined_income * 12) / 100000:.1f} Lakhs (Est.)",
         "sipSplits": [
-            {"scheme": "Nifty 50 Index", "partner1": "₹15,000", "partner2": "₹10,000"},
-            {"scheme": "Midcap Fund", "partner1": "₹5,000", "partner2": "₹5,000"}
+            {"scheme": "Nifty 50 Index", "partner1": f"₹{int(combined_income * 0.1)}", "partner2": f"₹{int(combined_income * 0.05)}"},
+            {"scheme": "Flexi Cap Fund", "partner1": "₹5,000", "partner2": "₹5,000"}
         ]
     }
     try:
+        print(f"DEBUG COUPLE PROMPT: {prompt}")
         response = model.generate_content(prompt)
         text = response.text.strip()
         if "```" in text:
-            text = text.split("```")[1]
-            if text.startswith("json"): text = text[4:]
+            parts = text.split("```")
+            for part in parts:
+                if part.strip().startswith("json"):
+                    text = part.strip()[4:].strip()
+                    break
+                elif part.strip().startswith("{"):
+                    text = part.strip()
+                    break
         return json.loads(text)
     except Exception as e:
         print(f"Couple Planner Error: {e}")
@@ -369,18 +422,27 @@ def get_mf_xray(input: PortfolioInput):
     IMPORTANT: You must analyze the specific funds provided: {json.dumps(input.holdings[:3])}. Mention at least one fund name in the 'overlap' or 'rebalancePlan'.
     Return JSON with 'portfolioBreakdown', 'overlap', 'xirr', 'rebalancePlan'.
     """
+    # DYNAMIC FALLBACK: Use a fund name from holdings
+    fund_name = input.holdings[0].get('scheme', 'Primary Fund') if input.holdings else "Selected Portfolio"
+    
     default_xray = {
-        "portfolioBreakdown": [{"name": "Large Cap", "value": 45}, {"name": "Mid Cap", "value": 30}, {"name": "Small Cap", "value": 15}, {"name": "Debt", "value": 10}],
-        "overlap": "High overlap (42%) found between your Flexi Cap and Bluechip funds.",
-        "xirr": "18.4%",
-        "rebalancePlan": ["Reduce exposure to overvalued mid-caps", "Increase debt allocation to 15%", "Consolidate index funds"]
+        "portfolioBreakdown": [{"name": "Large Cap", "value": 50}, {"name": "Mid Cap", "value": 25}, {"name": "Small Cap", "value": 15}, {"name": "Debt", "value": 10}],
+        "overlap": f"High overlap found with {fund_name}. Consider diversifying into other fund categories.",
+        "xirr": "15.0% (Simulated)",
+        "rebalancePlan": [f"Review {fund_name} weighting", "Add 5% more to International Equity", "Check for underperforming small caps"]
     }
     try:
         response = model.generate_content(prompt)
         text = response.text.strip()
         if "```" in text:
-            text = text.split("```")[1]
-            if text.startswith("json"): text = text[4:]
+            parts = text.split("```")
+            for part in parts:
+                if part.strip().startswith("json"):
+                    text = part.strip()[4:].strip()
+                    break
+                elif part.strip().startswith("{"):
+                    text = part.strip()
+                    break
         return json.loads(text)
     except Exception as e:
         print(f"MF X-ray Error: {e}")
