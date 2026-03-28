@@ -3,17 +3,26 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bell, Search, Info, AlertTriangle, CheckCircle } from "lucide-react";
+import { Bell, Search, Info, AlertTriangle, CheckCircle, LogOut, User } from "lucide-react";
 import { useDashboard } from "@/context/DashboardContext";
+import { auth } from "@/lib/firebase";
+import { signOut } from "firebase/auth";
+import { useRouter } from "next/navigation";
 
 export default function Topnav() {
   const { transactions, user } = useDashboard();
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const profileRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
+  const displayName = user?.displayName || user?.email?.split("@")[0] || "User";
+  const initials = displayName.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2);
+  const photoURL = user?.photoURL;
 
   // Simple alert logic
-  const alerts = [];
+  const alerts: any[] = [];
   if (transactions.length > 0) {
     const foodExpenses = transactions.filter(tx => tx.category === 'Food' || tx.category === 'Dining');
     const totalFood = foodExpenses.reduce((sum, tx) => sum + Number(tx.amount), 0);
@@ -46,10 +55,18 @@ export default function Topnav() {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsNotificationsOpen(false);
       }
+      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+        setIsProfileOpen(false);
+      }
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const handleSignOut = async () => {
+    await signOut(auth);
+    router.push("/login");
+  };
 
   return (
     <header className="h-16 border-b border-white/10 bg-black/80 backdrop-blur-md sticky top-0 z-30 flex items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -77,7 +94,8 @@ export default function Topnav() {
         </div>
       </div>
 
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center space-x-3">
+        {/* Notifications */}
         <div className="relative" ref={dropdownRef}>
           <button 
             onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
@@ -137,7 +155,60 @@ export default function Topnav() {
             )}
           </AnimatePresence>
         </div>
+
+        {/* Profile */}
+        <div className="relative" ref={profileRef}>
+          <button
+            onClick={() => setIsProfileOpen(!isProfileOpen)}
+            className="flex items-center gap-2 pl-1 pr-3 py-1 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-all group"
+          >
+            <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 border-2 border-white/10 group-hover:border-blue-500/50 transition-colors">
+              {photoURL ? (
+                <img src={photoURL} alt={displayName} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-black">
+                  {initials}
+                </div>
+              )}
+            </div>
+            <span className="text-xs font-bold text-white hidden sm:block max-w-[80px] truncate">{displayName}</span>
+          </button>
+
+          <AnimatePresence>
+            {isProfileOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                className="absolute right-0 mt-3 w-56 bg-[#0f0f0f] border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50"
+              >
+                <div className="p-4 border-b border-white/10 bg-white/[0.02]">
+                  <p className="text-sm font-black text-white truncate">{displayName}</p>
+                  <p className="text-[11px] text-gray-500 truncate mt-0.5">{user?.email}</p>
+                </div>
+                <div className="p-2">
+                  <Link
+                    href="/dashboard/profile"
+                    onClick={() => setIsProfileOpen(false)}
+                    className="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/5 rounded-xl transition-colors"
+                  >
+                    <User className="w-4 h-4" />
+                    View Profile
+                  </Link>
+                  <button
+                    onClick={handleSignOut}
+                    className="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-rose-400 hover:text-rose-300 hover:bg-rose-500/5 rounded-xl transition-colors"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Sign Out
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
     </header>
   );
 }
+
