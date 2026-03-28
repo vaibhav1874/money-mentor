@@ -56,6 +56,7 @@ export default function CouplePlanner() {
 
   const optimizeFinances = async () => {
     setLoading(true);
+    setPlan(null); // Clear previous plan
     try {
       const data = await fetchAPI("/api/couple-planner", {
         method: "POST",

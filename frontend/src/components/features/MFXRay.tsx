@@ -58,6 +58,7 @@ export default function MFXRay() {
 
   const analyzePortfolio = async () => {
     setLoading(true);
+    setResult(null); // Clear previous result
     try {
       const data = await fetchAPI("/api/mf-xray", {
         method: "POST",

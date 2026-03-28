@@ -208,14 +208,14 @@ def get_fire_plan(input: FIREInput):
     - Existing Investments: ₹{input.existingInvestments}, Risk Profile: {input.riskProfile}
     
     Include:
-    1. Systematic Investment Plan (SIP) amounts per goal.
+    1. Specific SIP amounts calculated for their income/expenses.
     2. Asset allocation shifts over time.
     3. Insurance gaps (Life, Health).
     4. Tax-saving moves (ELSS, NPS, etc.).
     5. Emergency fund targets.
     
-    Return the response in a structured JSON format with a 'roadmap' (list of milestones/months) and a 'summary'.
-    Return ONLY raw JSON.
+    IMPORTANT: You must explicitly mention the user's age ({input.age}) and income (₹{input.monthlyIncome}) in the 'overallAdvice' or 'details' to make it personalized.
+    Return ONLY raw JSON in a structured format with 'roadmap' (list of milestones/months) and a 'summary'.
     """
     default_plan = {
         "roadmap": [
@@ -237,6 +237,12 @@ def get_fire_plan(input: FIREInput):
         if "```" in text:
             text = text.split("```")[1]
             if text.startswith("json"): text = text[4:]
+        elif "[" in text or "{" in text:
+            # Try to find the start of JSON if it's buried in text
+            start = text.find("{")
+            end = text.rfind("}") + 1
+            if start != -1 and end != 0:
+                text = text[start:end]
         return json.loads(text)
     except Exception as e:
         print(f"FIRE Planner Error: {e}")
@@ -266,7 +272,9 @@ def get_life_event_advice(input: LifeEventInput):
     Details: {input.details}
     
     Consider Indian tax laws and investment options (NPS, VPF, MF, etc.).
-    Respond concisely with key action points. Return JSON with 'advice' and 'actions'.
+    Respond concisely with key action points. 
+    IMPORTANT: Explicitly mention the amount ₹{input.amount} in your advice.
+    Return JSON with 'advice' and 'actions'.
     """
     default_advice = {
         "advice": "General financial prudence suggests diversifying this windfall across debt and equity.",
@@ -291,6 +299,7 @@ def get_tax_wizard(input: TaxInput):
     Analyze salary and deductions: {json.dumps(input.salaryStructure)}, {json.dumps(input.deductions)}
     Compare Old vs New Tax Regime for the current Indian FY.
     Suggest missing deductions and tax-saving investments.
+    IMPORTANT: The input salary is {input.salaryStructure.get('basic', 0) + input.salaryStructure.get('hra', 0)}. Use these actual numbers in your 'recommendation'.
     Return JSON with 'oldRegimeTax', 'newRegimeTax', 'recommendation', and 'tips'.
     """
     default_tax = {
@@ -322,6 +331,7 @@ def get_couple_plan(input: CoupleInput):
     
     Optimize HRA, NPS matching, and SIP splits across both incomes for max tax efficiency.
     Track combined net worth.
+    IMPORTANT: Mention both partners' names or profiles ({json.dumps(input.partner1.get('name', 'Partner 1'))} and {json.dumps(input.partner2.get('name', 'Partner 2'))}) in the 'optimizationStrategy' to show it's personalized.
     Return JSON with 'optimizationStrategy', 'sipSplits', and 'jointNetWorth'.
     """
     default_couple = {
@@ -356,6 +366,7 @@ def get_mf_xray(input: PortfolioInput):
     - Expense ratio drag
     - AI-generated rebalancing plan
     
+    IMPORTANT: You must analyze the specific funds provided: {json.dumps(input.holdings[:3])}. Mention at least one fund name in the 'overlap' or 'rebalancePlan'.
     Return JSON with 'portfolioBreakdown', 'overlap', 'xirr', 'rebalancePlan'.
     """
     default_xray = {

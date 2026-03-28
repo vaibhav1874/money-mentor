@@ -43,6 +43,7 @@ export default function LifeEventAdvisor() {
 
   const getAdvice = async () => {
     setLoading(true);
+    setResult(null); // Clear previous result
     try {
       const data = await fetchAPI("/api/life-event-advisor", {
         method: "POST",

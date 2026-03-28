@@ -69,6 +69,7 @@ export default function TaxWizard() {
 
   const calculateTax = async () => {
     setLoading(true);
+    setResult(null); // Clear previous result
     try {
       const data = await fetchAPI("/api/tax-wizard", {
         method: "POST",

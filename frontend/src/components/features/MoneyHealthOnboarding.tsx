@@ -103,6 +103,7 @@ export default function MoneyHealthOnboarding() {
 
   const calculateScore = async () => {
     setLoading(true);
+    setResult(null); // Clear previous result
     try {
       const data = await fetchAPI("/api/money-health-score", {
         method: "POST",

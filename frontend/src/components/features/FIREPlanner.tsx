@@ -85,6 +85,7 @@ export default function FIREPlanner() {
 
   const generatePlan = async () => {
     setLoading(true);
+    setPlan(null); // Clear previous plan to show new loading state
     try {
       const data = await fetchAPI("/api/fire-planner", {
         method: "POST",
