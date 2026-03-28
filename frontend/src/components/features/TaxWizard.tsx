@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { fetchAPI } from "@/lib/api";
 import { 
   ReceiptText, 
   ChevronRight, 
@@ -71,14 +72,12 @@ export default function TaxWizard() {
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), 20000);
     try {
-      const response = await fetch("http://localhost:8000/api/tax-wizard", {
+      const data = await fetchAPI("/api/tax-wizard", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
         signal: controller.signal
       });
       clearTimeout(id);
-      const data = await response.json();
       setResult(data);
     } catch (error) {
       console.error("Tax calculation error:", error);

@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { fetchAPI } from "@/lib/api";
 import { 
   Send, 
   Sparkles, 
@@ -49,14 +50,10 @@ export default function ChatPage() {
     setLoading(true);
     
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-      const res = await fetch(`${baseUrl}/api/chat`, {
+      const data = await fetchAPI("/api/chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: newMessage.text })
       });
-      
-      const data = await res.json();
       
       setMessages(prev => [
         ...prev,

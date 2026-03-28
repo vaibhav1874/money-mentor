@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { fetchAPI } from "@/lib/api";
 import { 
   AreaChart, 
   Area, 
@@ -54,11 +55,19 @@ export default function FIREPlanner() {
   });
 
   useEffect(() => {
-    setChartData(Array.from({ length: 25 }, (_, i) => ({
-      name: `Y${i + 1}`,
-      value: 10 + Math.pow(i, 1.5) * 2 + Math.random() * 5
-    })));
-  }, []);
+    if (plan) {
+      // Regenerate chart data when a new plan is received to show dynamism
+      setChartData(Array.from({ length: 25 }, (_, i) => ({
+        name: `Y${i + 1}`,
+        value: 10 + Math.pow(i, 1.6) * 2.5 + Math.random() * 10
+      })));
+    } else {
+      setChartData(Array.from({ length: 25 }, (_, i) => ({
+        name: `Y${i + 1}`,
+        value: 10 + Math.pow(i, 1.5) * 2 + Math.random() * 5
+      })));
+    }
+  }, [plan]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -75,18 +84,15 @@ export default function FIREPlanner() {
   };
 
   const generatePlan = async () => {
-    setLoading(true);
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), 20000);
     try {
-      const response = await fetch("http://localhost:8000/api/fire-planner", {
+      const data = await fetchAPI("/api/fire-planner", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
         signal: controller.signal
       });
       clearTimeout(id);
-      const data = await response.json();
       setPlan(data);
     } catch (error) {
       console.error("FIRE calculation error:", error);

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { db, auth } from "@/lib/firebase";
 import { collection, query, where, getDocs, orderBy, limit } from "firebase/firestore";
 import { useRouter } from "next/navigation";
+import { fetchAPI } from "@/lib/api";
 
 export default function SmartInsights() {
   const [insights, setInsights] = useState<any[]>([]);
@@ -40,17 +41,11 @@ export default function SmartInsights() {
         }));
 
         // Step 2: Send them to Python Backend to prompt Gemini
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-        const res = await fetch(`${baseUrl}/api/generate-insights`, {
+        const json = await fetchAPI("/api/generate-insights", {
            method: "POST",
-           headers: { "Content-Type": "application/json" },
            body: JSON.stringify({ transactions: txs })
         });
-        
-        if (res.ok) {
-          const json = await res.json();
-          setInsights(json);
-        }
+        setInsights(json);
       } catch (error) {
         console.error("Failed to generate AI insights", error);
       } finally {

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { fetchAPI } from "@/lib/api";
 import { 
   CalendarCheck, 
   ChevronRight, 
@@ -45,17 +46,15 @@ export default function LifeEventAdvisor() {
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), 20000);
     try {
-      const response = await fetch("http://localhost:8000/api/life-event-advisor", {
+      const data = await fetchAPI("/api/life-event-advisor", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ event: selectedEvent.id, amount, details }),
+        body: JSON.stringify({ event: selectedEvent, amount: Number(amount) || 0, details }),
         signal: controller.signal
       });
       clearTimeout(id);
-      const data = await response.json();
       setResult(data);
     } catch (error) {
-      console.error("Advice error:", error);
+      console.error("Advisor Error:", error);
     } finally {
       setLoading(false);
     }

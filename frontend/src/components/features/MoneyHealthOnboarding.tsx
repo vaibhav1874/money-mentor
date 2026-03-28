@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { fetchAPI } from "@/lib/api";
 import { 
   Activity, 
   ChevronRight, 
@@ -102,16 +103,17 @@ export default function MoneyHealthOnboarding() {
 
   const calculateScore = async () => {
     setLoading(true);
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), 20000);
     try {
-      const response = await fetch("http://localhost:8000/api/money-health-score", {
+      const data = await fetchAPI("/api/money-health-score", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(responses)
+        body: JSON.stringify(responses),
+        signal: controller.signal
       });
-      const data = await response.json();
       setResult(data);
     } catch (error) {
-      console.error("Score calculation error:", error);
+      console.error("Health calculation error:", error);
     } finally {
       setLoading(false);
     }

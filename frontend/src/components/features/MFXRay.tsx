@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { fetchAPI } from "@/lib/api";
 import { 
   ScanSearch, 
   ChevronRight, 
@@ -60,17 +61,15 @@ export default function MFXRay() {
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), 20000);
     try {
-      const response = await fetch("http://localhost:8000/api/mf-xray", {
+      const data = await fetchAPI("/api/mf-xray", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ holdings, rawText }),
+        body: JSON.stringify({ holdings }),
         signal: controller.signal
       });
       clearTimeout(id);
-      const data = await response.json();
       setResult(data);
     } catch (error) {
-      console.error("X-Ray analysis error:", error);
+      console.error("MF X-ray Error:", error);
     } finally {
       setLoading(false);
     }

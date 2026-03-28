@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { fetchAPI } from "@/lib/api";
 import { 
   Users2, 
   TrendingUp, 
@@ -58,17 +59,15 @@ export default function CouplePlanner() {
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), 20000);
     try {
-      const response = await fetch("http://localhost:8000/api/couple-planner", {
+      const data = await fetchAPI("/api/couple-planner", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
         signal: controller.signal
       });
       clearTimeout(id);
-      const data = await response.json();
       setPlan(data);
     } catch (error) {
-      console.error("Optimization error:", error);
+      console.error("Couple Planner Error:", error);
     } finally {
       setLoading(false);
     }
